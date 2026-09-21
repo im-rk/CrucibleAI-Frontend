@@ -20,7 +20,7 @@ export const Footer: React.FC<FooterProps> = ({ health }) => {
         <div className="flex items-center gap-4 text-[11px]">
           <span className="flex items-center gap-1.5">
             <Database className="w-3.5 h-3.5 text-cyan-600 dark:text-cyan-400" />
-            Chunks: <strong className="text-slate-900 dark:text-slate-200">{health?.vector_store_chunks ?? 1138}</strong>
+            Chunks: <strong className="text-slate-900 dark:text-slate-200">{health?.vector_store_chunks ?? '—'}</strong>
           </span>
           <span className="text-slate-300 dark:text-slate-700">•</span>
           <span className="flex items-center gap-1.5">

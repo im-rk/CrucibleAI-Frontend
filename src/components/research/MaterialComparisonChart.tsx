@@ -136,7 +136,7 @@ export const MaterialComparisonChart: React.FC<MaterialComparisonChartProps> = (
                       </span>
                     )}
                     <span className="text-slate-800 dark:text-slate-200">
-                      MP: <span className="font-bold">{knownVal} {item.unit}</span>
+                      Reported: <span className="font-bold">{knownVal} {item.unit}</span>
                     </span>
                   </div>
                 </div>
@@ -144,7 +144,7 @@ export const MaterialComparisonChart: React.FC<MaterialComparisonChartProps> = (
                 {/* Meter Progress Bars */}
                 <div className="space-y-1.5">
                   <div className="flex items-center gap-2">
-                    <span className="text-[10px] font-mono text-slate-500 dark:text-slate-400 w-16">MP Known</span>
+                    <span className="text-[10px] font-mono text-slate-500 dark:text-slate-400 w-16">Reported</span>
                     <div className="flex-1 bg-slate-200 dark:bg-slate-900 h-3 rounded-full overflow-hidden border border-slate-300 dark:border-slate-800">
                       <div
                         className="bg-gradient-to-r from-cyan-500 to-indigo-500 h-full rounded-full transition-all duration-500"

@@ -7,6 +7,13 @@ export interface PresetQuery {
 
 export const PRESET_QUERIES: PresetQuery[] = [
   {
+    title: 'Multi-Criteria Solid-State Electrolyte Screen',
+    query:
+      'Find solid-state electrolyte materials with ionic conductivity above 10⁻³ S/cm, electrochemical stability above 5V, and no rare earth elements',
+    category: 'Electrolytes',
+    description: 'The full workflow: parse three criteria, extract measured values, exclude rare earths, rank candidates, and propose testable hypotheses.',
+  },
+  {
     title: 'Solid-State Battery Electrolyte Conductivity',
     query: 'solid state electrolyte ionic conductivity lithium garnet LLZO',
     category: 'Electrolytes',
