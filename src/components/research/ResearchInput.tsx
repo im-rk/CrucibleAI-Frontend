@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Search, Sparkles, Sliders } from 'lucide-react';
 import { Button } from '../common/Button';
 import { sounds } from '../../utils/audio';
@@ -16,6 +16,11 @@ export const ResearchInput: React.FC<ResearchInputProps> = ({
 }) => {
   const [query, setQuery] = useState<string>(initialQuery);
   const [maxResults, setMaxResults] = useState<number>(10);
+
+  // A preset or palette query starts a run from outside this form: show what is being run.
+  useEffect(() => {
+    setQuery(initialQuery);
+  }, [initialQuery]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
