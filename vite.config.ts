@@ -14,7 +14,9 @@ export default defineConfig({
     port: 3000,
     proxy: {
       '/api': {
-        target: 'http://localhost:8000',
+        // 127.0.0.1, not 'localhost': Node resolves localhost to ::1 first, where Docker/WSL often
+        // owns port 8000, so the proxy would silently reach the wrong service.
+        target: process.env.VITE_PROXY_TARGET || 'http://127.0.0.1:8000',
         changeOrigin: true,
       },
     },

@@ -1,107 +1,80 @@
 import { useState, useCallback, useRef } from 'react';
-import {
-  ResearchStatus,
-  ResearchResponse,
-  SSEProgressEvent,
-} from '../types/api';
-import { api } from '../services/api';
-import { subscribeResearchStream, SSESubscription } from '../services/sse';
+import { ResearchStatus, ResearchResponse } from '../types/api';
+import { streamResearch } from '../services/sse';
+import { applyEvent, initialProgress, RunProgress } from '../utils/progress';
 
 export function useResearch() {
   const [status, setStatus] = useState<ResearchStatus>('IDLE');
   const [query, setQuery] = useState<string>('');
-  const [sseEvents, setSseEvents] = useState<SSEProgressEvent[]>([]);
-  const [overallProgress, setOverallProgress] = useState<number>(0);
-  const [currentStepMessage, setCurrentStepMessage] = useState<string>('');
+  const [progress, setProgress] = useState<RunProgress>(initialProgress);
   const [result, setResult] = useState<ResearchResponse | null>(null);
   const [error, setError] = useState<string | null>(null);
 
-  const sseSubscriptionRef = useRef<SSESubscription | null>(null);
+  const abortRef = useRef<AbortController | null>(null);
 
-  const cleanupStream = useCallback(() => {
-    if (sseSubscriptionRef.current) {
-      sseSubscriptionRef.current.unsubscribe();
-      sseSubscriptionRef.current = null;
-    }
+  const cancel = useCallback(() => {
+    abortRef.current?.abort();
+    abortRef.current = null;
   }, []);
 
   const resetResearch = useCallback(() => {
-    cleanupStream();
+    cancel();
     setStatus('IDLE');
     setQuery('');
-    setSseEvents([]);
-    setOverallProgress(0);
-    setCurrentStepMessage('');
+    setProgress(initialProgress());
     setResult(null);
     setError(null);
-  }, [cleanupStream]);
+  }, [cancel]);
 
   const executeResearch = useCallback(
     async (searchQuery: string, maxResults = 10) => {
       const trimmed = searchQuery.trim();
       if (!trimmed) return;
 
-      cleanupStream();
+      cancel();
+      const controller = new AbortController();
+      abortRef.current = controller;
+
       setStatus('SUBMITTING');
       setQuery(trimmed);
-      setSseEvents([]);
-      setOverallProgress(10);
-      setCurrentStepMessage('Initializing research run session...');
+      setProgress(initialProgress());
       setResult(null);
       setError(null);
 
-      // 1. Subscribe to SSE event stream in parallel for live agent progress
-      sseSubscriptionRef.current = subscribeResearchStream(
-        (event) => {
-          setStatus('STREAMING');
-          setSseEvents((prev) => {
-            // Avoid duplicate step entries if repeated
-            const exists = prev.some((e) => e.step === event.step && e.progress === event.progress);
-            if (exists) return prev;
-            return [...prev, event];
-          });
-          setOverallProgress(event.progress);
-          setCurrentStepMessage(event.message);
-        },
-        (_err) => {
-          // SSE connection warning fallback - don't crash main research call
-        },
-        () => {
-          // SSE stream completed
-        }
-      );
-
-      // 2. Submit main research workflow request to backend
       try {
-        const responseData = await api.submitResearch({
-          query: trimmed,
-          max_results: maxResults,
-        });
-
-        cleanupStream();
-        setResult(responseData);
-        setOverallProgress(100);
+        const report = await streamResearch(
+          { query: trimmed, max_results: maxResults },
+          (event) => {
+            setStatus('STREAMING');
+            setProgress((prev) => applyEvent(prev, event));
+          },
+          controller.signal,
+        );
+        setResult(report);
+        setProgress((prev) => ({ ...prev, percent: 100, message: 'Research complete' }));
         setStatus('COMPLETED');
       } catch (err) {
-        cleanupStream();
-        const errorMessage =
-          err instanceof Error ? err.message : 'An unexpected error occurred during research execution';
-        setError(errorMessage);
+        if (controller.signal.aborted) {
+          setStatus('IDLE'); // the user stopped it: not an error
+          return;
+        }
+        setError(err instanceof Error ? err.message : 'An unexpected error occurred during research execution');
         setStatus('ERROR');
+      } finally {
+        if (abortRef.current === controller) abortRef.current = null;
       }
     },
-    [cleanupStream]
+    [cancel],
   );
 
   return {
     status,
     query,
-    sseEvents,
-    overallProgress,
-    currentStepMessage,
+    progress,
     result,
     error,
     executeResearch,
     resetResearch,
+    cancelResearch: cancel,
   };
 }

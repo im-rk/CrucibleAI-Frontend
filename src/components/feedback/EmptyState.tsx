@@ -1,13 +1,14 @@
 import React from 'react';
-import { CorpusStatsResponse } from '../../types/api';
+import { CorpusStatsResponse, HealthResponse } from '../../types/api';
 import { Card, CardContent } from '../common/Card';
 import { Database, FileText, Sparkles, ShieldCheck } from 'lucide-react';
 
 interface EmptyStateProps {
   corpus?: CorpusStatsResponse | null;
+  health?: HealthResponse | null;
 }
 
-export const EmptyState: React.FC<EmptyStateProps> = ({ corpus }) => {
+export const EmptyState: React.FC<EmptyStateProps> = ({ corpus, health }) => {
   return (
     <Card className="border-slate-200 dark:border-slate-800">
       <CardContent className="p-8 text-center space-y-6">
@@ -33,7 +34,7 @@ export const EmptyState: React.FC<EmptyStateProps> = ({ corpus }) => {
                 <span className="font-semibold">Vector Store</span>
               </div>
               <p className="text-lg font-bold text-slate-900 dark:text-slate-100">
-                {corpus.total_chunks || 1138} <span className="text-xs font-normal text-slate-500">chunks</span>
+                {corpus.total_chunks} <span className="text-xs font-normal text-slate-500">chunks</span>
               </p>
               <span className="text-[10px] text-slate-500 block">ChromaDB Vector DB</span>
             </div>
@@ -44,7 +45,7 @@ export const EmptyState: React.FC<EmptyStateProps> = ({ corpus }) => {
                 <span className="font-semibold">Paper Corpus</span>
               </div>
               <p className="text-lg font-bold text-slate-900 dark:text-slate-100">
-                {corpus.sample_papers?.length || 14} <span className="text-xs font-normal text-slate-500">sample papers</span>
+                {corpus.total_papers} <span className="text-xs font-normal text-slate-500">papers</span>
               </p>
               <span className="text-[10px] text-slate-500 block">arXiv Preprints</span>
             </div>
@@ -55,9 +56,9 @@ export const EmptyState: React.FC<EmptyStateProps> = ({ corpus }) => {
                 <span className="font-semibold">Materials DB</span>
               </div>
               <p className="text-lg font-bold text-slate-900 dark:text-slate-100">
-                Active <span className="text-xs font-normal text-slate-500">REST API</span>
+                {health?.llm && !health.llm.startsWith('not configured') ? 'LLM on' : 'Heuristic'} <span className="text-xs font-normal text-slate-500">mode</span>
               </p>
-              <span className="text-[10px] text-slate-500 block">Materials Project</span>
+              <span className="text-[10px] text-slate-500 block">{health?.materials_project_api ?? 'backend status unknown'}</span>
             </div>
           </div>
         )}

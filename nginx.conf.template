@@ -1,0 +1,23 @@
+# Serves the built app and proxies /api to the backend. ${API_UPSTREAM} is filled in from the
+# environment when the container starts (default set in the Dockerfile).
+server {
+    listen 80;
+    root /usr/share/nginx/html;
+    index index.html;
+
+    location /api/ {
+        proxy_pass ${API_UPSTREAM};
+        proxy_http_version 1.1;
+        proxy_set_header Connection "";
+        proxy_set_header Host $host;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        # Server-Sent Events: do not buffer, and allow a long-running research request.
+        proxy_buffering off;
+        proxy_cache off;
+        proxy_read_timeout 360s;
+    }
+
+    location / {
+        try_files $uri /index.html;
+    }
+}

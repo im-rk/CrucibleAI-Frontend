@@ -58,11 +58,14 @@ export const PredictionDisplay: React.FC<PredictionDisplayProps> = ({
                     <span className="text-[10px] text-slate-500 dark:text-slate-400 uppercase tracking-wider block">KRR ML Predicted</span>
                     <span className="text-lg font-bold text-indigo-600 dark:text-indigo-400">
                       {pred.predicted_value} <span className="text-xs">{pred.unit}</span>
+                      {pred.uncertainty != null && (
+                        <span className="text-xs font-normal text-slate-500"> ±{pred.uncertainty}</span>
+                      )}
                     </span>
                   </div>
 
                   <div className="bg-white dark:bg-slate-900/90 p-2.5 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm">
-                    <span className="text-[10px] text-slate-500 dark:text-slate-400 uppercase tracking-wider block">Materials Project</span>
+                    <span className="text-[10px] text-slate-500 dark:text-slate-400 uppercase tracking-wider block">Reported (database / literature)</span>
                     <span className="text-lg font-bold text-slate-800 dark:text-slate-200">
                       {knownBgProp ? `${knownBgProp.value}` : 'N/A'}{' '}
                       <span className="text-xs">{knownBgProp?.unit || 'eV'}</span>
