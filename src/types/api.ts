@@ -230,7 +230,8 @@ export interface CorpusSamplePaper {
 
 export interface CorpusStatsResponse {
   total_chunks: number;
-  total_papers: number;
+  /** null when the backend's vector store cannot enumerate papers (e.g. Pinecone). */
+  total_papers: number | null;
   sample_papers: CorpusSamplePaper[];
 }
 
