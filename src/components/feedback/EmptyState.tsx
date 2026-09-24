@@ -45,7 +45,7 @@ export const EmptyState: React.FC<EmptyStateProps> = ({ corpus, health }) => {
                 <span className="font-semibold">Paper Corpus</span>
               </div>
               <p className="text-lg font-bold text-slate-900 dark:text-slate-100">
-                {corpus.total_papers} <span className="text-xs font-normal text-slate-500">papers</span>
+                {corpus.total_papers ?? '—'} <span className="text-xs font-normal text-slate-500">papers</span>
               </p>
               <span className="text-[10px] text-slate-500 block">arXiv Preprints</span>
             </div>
