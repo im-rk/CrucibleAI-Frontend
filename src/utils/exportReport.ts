@@ -26,7 +26,7 @@ export function buildResearchMarkdown(result: ResearchResponse, now = new Date()
     `**Session**: \`${result.session_id}\`  `,
     `**Date**: ${now.toISOString()}  `,
     `**Duration**: ${(result.duration_ms / 1000).toFixed(1)}s, ${result.retrieval_attempts} retrieval pass(es)  `,
-    `**Mode**: ${result.mode.llm ? `LLM ${result.mode.llm}` : 'no LLM (heuristic mode)'}; materials data: ${
+    `**Mode**: ${result.mode.llm ? `LLM ${result.mode.llm}` : `no LLM (heuristic mode${result.mode.llm_unavailable_reason ? `: ${result.mode.llm_unavailable_reason}` : ''})`}; materials data: ${
       result.mode.materials_project === 'live' ? 'Materials Project (live)' : 'offline reference table'
     }`,
   );

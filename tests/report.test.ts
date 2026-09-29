@@ -75,3 +75,24 @@ describe('buildResearchMarkdown', () => {
     expect(md).toContain('[C1] Superionic sulfides, A, B (2024) <https://arxiv.org/abs/2401.2>');
   });
 });
+
+import { keyMissing } from '../src/components/research/RunModeBanner';
+
+describe('keyMissing', () => {
+  it('asks for keys only when a key is actually absent', () => {
+    expect(keyMissing({ llm: null, llm_unavailable_reason: 'ANTHROPIC_API_KEY is not configured', materials_project: 'live' })).toBe(true);
+    expect(keyMissing({ llm: null, materials_project: 'live' })).toBe(true);
+    expect(keyMissing({ llm: 'claude-sonnet-4-6', materials_project: 'offline' })).toBe(true);
+    // key present but the account has no credits: adding a key would not help
+    expect(keyMissing({ llm: null, llm_unavailable_reason: 'the Anthropic account has no credits', materials_project: 'live' })).toBe(false);
+    expect(keyMissing({ llm: 'claude-sonnet-4-6', materials_project: 'live' })).toBe(false);
+  });
+
+  it('puts the unavailability reason in the exported report', () => {
+    const md = buildResearchMarkdown(
+      { ...REPORT, mode: { llm: null, llm_unavailable_reason: 'the Anthropic account has no credits', materials_project: 'live' } },
+      new Date('2026-09-21T00:00:00Z'),
+    );
+    expect(md).toContain('no LLM (heuristic mode: the Anthropic account has no credits)');
+  });
+});

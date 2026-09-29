@@ -157,6 +157,8 @@ export interface Grounding {
 /** What the run actually used: `llm` is the model id, or null in heuristic mode. */
 export interface RunMode {
   llm: string | null;
+  /** Why the LLM was not used (no key, rejected key, no credits); null when it was. */
+  llm_unavailable_reason?: string | null;
   materials_project: 'live' | 'offline';
 }
 
