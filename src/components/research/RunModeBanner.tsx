@@ -9,6 +9,12 @@ interface RunModeBannerProps {
   warnings: string[];
 }
 
+/** A key is missing (as opposed to present but rejected, e.g. an account without credits). */
+export function keyMissing(mode: RunMode): boolean {
+  const llmKeyMissing = mode.llm === null && (!mode.llm_unavailable_reason || mode.llm_unavailable_reason.includes('not configured'));
+  return llmKeyMissing || mode.materials_project === 'offline';
+}
+
 /**
  * Says plainly what the run used. Heuristic mode (no LLM) and the offline materials table are
  * degraded modes, and the results should not be read as if they came from the full pipeline.
@@ -49,7 +55,15 @@ export const RunModeBanner: React.FC<RunModeBannerProps> = ({ mode, warnings }) 
           <p className="text-xs text-slate-600 dark:text-slate-400 font-sans">
             {mode.llm === null && 'Extraction, criteria parsing and hypotheses used simple rules instead of a language model, so they are less complete and lower confidence. '}
             {mode.materials_project === 'offline' && 'Only a small table of well-known band gaps was available for database cross-checks. '}
-            Add <code className="font-mono">ANTHROPIC_API_KEY</code> and <code className="font-mono">MATERIALS_PROJECT_API_KEY</code> to the backend to enable the full pipeline.
+            {mode.llm === null && mode.llm_unavailable_reason && (
+              <>Language model unavailable: {mode.llm_unavailable_reason}. </>
+            )}
+            {keyMissing(mode) && (
+              <>
+                Add <code className="font-mono">ANTHROPIC_API_KEY</code> and{' '}
+                <code className="font-mono">MATERIALS_PROJECT_API_KEY</code> to the backend to enable the full pipeline.
+              </>
+            )}
           </p>
         )}
 
