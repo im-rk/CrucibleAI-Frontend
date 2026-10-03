@@ -15,7 +15,7 @@ export const KnowledgeGapsPanel: React.FC<KnowledgeGapsPanelProps> = ({ gaps, cr
     <Card className="border-slate-200 dark:border-slate-800">
       <CardHeader>
         <CardTitle icon={<HelpCircle className="w-5 h-5 text-amber-600 dark:text-amber-400" />}>Knowledge Gaps</CardTitle>
-        <span className="text-xs font-mono text-slate-500">{gaps.length}</span>
+        <span className="text-xs text-slate-500">{gaps.length}</span>
       </CardHeader>
       <CardContent>
         {gaps.length === 0 ? (
@@ -32,9 +32,9 @@ export const KnowledgeGapsPanel: React.FC<KnowledgeGapsPanelProps> = ({ gaps, cr
 
     <Card className="border-slate-200 dark:border-slate-800">
       <CardHeader>
-        <CardTitle icon={<ListChecks className="w-5 h-5 text-cyan-600 dark:text-cyan-400" />}>What Was Screened</CardTitle>
+        <CardTitle icon={<ListChecks className="w-5 h-5 text-cyan-600 dark:text-cyan-400" />}>What was screened</CardTitle>
       </CardHeader>
-      <CardContent className="space-y-4 text-xs font-mono">
+      <CardContent className="space-y-4 text-xs">
         <div>
           <p className="text-slate-500 uppercase text-[10px] mb-1">Criteria parsed from your goal</p>
           {criteria.length === 0 ? (

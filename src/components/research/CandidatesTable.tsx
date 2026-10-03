@@ -6,9 +6,8 @@ import { Card, CardHeader, CardTitle, CardContent } from '../common/Card';
 import { Badge } from '../common/Badge';
 import {
   ArrowDown, ArrowUp, CheckCircle2, ChevronDown, ChevronUp, ExternalLink, HelpCircle, Layers,
-  MinusCircle, Sparkles, XCircle,
+  MinusCircle, Info, XCircle,
 } from 'lucide-react';
-import { sounds } from '../../utils/audio';
 import { SortKey, sortCandidates } from '../../utils/candidates';
 
 interface CandidatesTableProps {
@@ -27,8 +26,8 @@ const CRITERION_ICON: Record<CriterionStatus, { icon: React.ElementType; classNa
   met: { icon: CheckCircle2, className: 'text-emerald-600 dark:text-emerald-400', text: 'Met' },
   not_met: { icon: XCircle, className: 'text-rose-600 dark:text-rose-400', text: 'Not met' },
   missing: { icon: HelpCircle, className: 'text-slate-400', text: 'No data' },
-  predicted_met: { icon: Sparkles, className: 'text-indigo-600 dark:text-indigo-400', text: 'Predicted to meet (ML estimate)' },
-  predicted_not_met: { icon: Sparkles, className: 'text-rose-500', text: 'Predicted not to meet (ML estimate)' },
+  predicted_met: { icon: Info, className: 'text-indigo-600 dark:text-indigo-400', text: 'Predicted to meet (ML estimate)' },
+  predicted_not_met: { icon: Info, className: 'text-rose-500', text: 'Predicted not to meet (ML estimate)' },
   unverified: { icon: MinusCircle, className: 'text-slate-400', text: 'Cannot be verified from data' },
 };
 
@@ -55,7 +54,6 @@ export const CandidatesTable: React.FC<CandidatesTableProps> = ({ candidates, pr
   const rows = useMemo(() => sortCandidates(candidates, sortKey, ascending), [candidates, sortKey, ascending]);
 
   const toggleSort = (key: SortKey) => {
-    sounds.playClick();
     if (key === sortKey) setAscending((a) => !a);
     else {
       setSortKey(key);
@@ -76,9 +74,9 @@ export const CandidatesTable: React.FC<CandidatesTableProps> = ({ candidates, pr
     <Card className="border-slate-200 dark:border-slate-800">
       <CardHeader>
         <CardTitle icon={<Layers className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />}>
-          Ranked Candidates & Evidence
+          Candidates
         </CardTitle>
-        <span className="text-xs font-mono text-slate-500 dark:text-slate-400">
+        <span className="text-xs text-slate-500 dark:text-slate-400">
           {candidates.filter((c) => c.status === 'qualified').length} qualified of {candidates.length} screened
         </span>
       </CardHeader>
@@ -90,7 +88,7 @@ export const CandidatesTable: React.FC<CandidatesTableProps> = ({ candidates, pr
           </p>
         ) : (
           <table className="w-full text-left text-sm text-slate-800 dark:text-slate-300">
-            <thead className="bg-slate-100 dark:bg-slate-950/80 text-xs font-mono text-slate-600 dark:text-slate-400 border-b border-slate-200 dark:border-slate-800">
+            <thead className="bg-slate-100 dark:bg-slate-950/80 text-xs text-slate-600 dark:text-slate-400 border-b border-slate-200 dark:border-slate-800">
               <tr>
                 {header('rank', '#')}
                 {header('name', 'Material')}
@@ -111,12 +109,11 @@ export const CandidatesTable: React.FC<CandidatesTableProps> = ({ candidates, pr
                   <React.Fragment key={key}>
                     <tr
                       onClick={() => {
-                        sounds.playClick();
                         setExpanded(isOpen ? null : key);
                       }}
                       className="hover:bg-slate-100 dark:hover:bg-slate-850/50 cursor-pointer transition-colors"
                     >
-                      <td className="py-3.5 px-4 font-mono text-slate-500">{cand.rank}</td>
+                      <td className="py-3.5 px-4 text-slate-500">{cand.rank}</td>
                       <td className="py-3.5 px-4">
                         <div className="flex flex-wrap items-center gap-2">
                           <span className="font-mono font-bold text-cyan-700 dark:text-cyan-400 bg-cyan-500/10 px-2 py-0.5 rounded border border-cyan-500/20">
@@ -136,9 +133,9 @@ export const CandidatesTable: React.FC<CandidatesTableProps> = ({ candidates, pr
                         </div>
                       </td>
                       <td className="py-3.5 px-4">
-                        <div className="flex items-center gap-2 font-mono text-xs">
-                          <div className="w-16 h-2 rounded-full bg-slate-200 dark:bg-slate-800 overflow-hidden">
-                            <div className="h-full bg-gradient-to-r from-cyan-500 to-emerald-500" style={{ width: `${Math.round(cand.score * 100)}%` }} />
+                        <div className="flex items-center gap-2 text-xs">
+                          <div className="w-16 h-2 rounded-sm bg-slate-200 dark:bg-slate-800 overflow-hidden">
+                            <div className="h-full bg-cyan-600" style={{ width: `${Math.round(cand.score * 100)}%` }} />
                           </div>
                           {cand.score.toFixed(2)}
                         </div>
@@ -151,7 +148,7 @@ export const CandidatesTable: React.FC<CandidatesTableProps> = ({ candidates, pr
                     {isOpen && (
                       <tr className="bg-slate-50 dark:bg-slate-950/90">
                         <td colSpan={6} className="p-4">
-                          <div className="space-y-4 font-mono text-xs">
+                          <div className="space-y-4 text-xs">
                             <table className="w-full">
                               <thead className="text-slate-500 text-[10px] uppercase">
                                 <tr>

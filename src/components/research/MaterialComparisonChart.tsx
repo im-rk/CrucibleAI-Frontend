@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import { MaterialProperty, KRRPrediction } from '../../types/api';
 import { Card, CardHeader, CardTitle, CardContent } from '../common/Card';
 import { BarChart3 } from 'lucide-react';
-import { sounds } from '../../utils/audio';
 
 interface MaterialComparisonChartProps {
   candidateFormulas: string[];
@@ -59,15 +58,14 @@ export const MaterialComparisonChart: React.FC<MaterialComparisonChartProps> = (
         </CardTitle>
 
         {/* Metric Selector Buttons */}
-        <div className="flex items-center gap-1.5 bg-slate-100 dark:bg-slate-950 p-1 rounded-lg border border-slate-200 dark:border-slate-800 font-mono text-xs">
+        <div className="flex items-center gap-1.5 bg-slate-100 dark:bg-slate-950 p-1 rounded-lg border border-slate-200 dark:border-slate-800 text-xs">
           <button
             onClick={() => {
-              sounds.playClick();
               setMetric('bandgap');
             }}
             className={`px-3 py-1 rounded transition-all ${
               metric === 'bandgap'
-                ? 'bg-cyan-500/20 text-cyan-700 dark:text-cyan-400 border border-cyan-500/30 font-semibold shadow-sm'
+                ? 'bg-cyan-500/20 text-cyan-700 dark:text-cyan-400 border border-cyan-500/30 font-semibold'
                 : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200'
             }`}
           >
@@ -75,12 +73,11 @@ export const MaterialComparisonChart: React.FC<MaterialComparisonChartProps> = (
           </button>
           <button
             onClick={() => {
-              sounds.playClick();
               setMetric('formation_energy');
             }}
             className={`px-3 py-1 rounded transition-all ${
               metric === 'formation_energy'
-                ? 'bg-indigo-500/20 text-indigo-700 dark:text-indigo-400 border border-indigo-500/30 font-semibold shadow-sm'
+                ? 'bg-indigo-500/20 text-indigo-700 dark:text-indigo-400 border border-indigo-500/30 font-semibold'
                 : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200'
             }`}
           >
@@ -88,12 +85,11 @@ export const MaterialComparisonChart: React.FC<MaterialComparisonChartProps> = (
           </button>
           <button
             onClick={() => {
-              sounds.playClick();
               setMetric('density');
             }}
             className={`px-3 py-1 rounded transition-all ${
               metric === 'density'
-                ? 'bg-emerald-500/20 text-emerald-700 dark:text-emerald-400 border border-emerald-500/30 font-semibold shadow-sm'
+                ? 'bg-emerald-500/20 text-emerald-700 dark:text-emerald-400 border border-emerald-500/30 font-semibold'
                 : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200'
             }`}
           >
@@ -126,8 +122,8 @@ export const MaterialComparisonChart: React.FC<MaterialComparisonChartProps> = (
             const predPercent = Math.min(100, Math.max(12, (predVal / maxVal) * 100));
 
             return (
-              <div key={item.formula} className="space-y-1.5 p-3.5 rounded-xl bg-slate-50 dark:bg-slate-950/60 border border-slate-200 dark:border-slate-800/80 shadow-sm">
-                <div className="flex items-center justify-between text-xs font-mono">
+              <div key={item.formula} className="space-y-1.5 p-3.5 rounded-md bg-slate-50 dark:bg-slate-950/60 border border-slate-200 dark:border-slate-800/80">
+                <div className="flex items-center justify-between text-xs">
                   <span className="font-bold text-cyan-700 dark:text-cyan-400 text-sm">{item.formula}</span>
                   <div className="flex items-center gap-3">
                     {metric === 'bandgap' && (
@@ -144,10 +140,10 @@ export const MaterialComparisonChart: React.FC<MaterialComparisonChartProps> = (
                 {/* Meter Progress Bars */}
                 <div className="space-y-1.5">
                   <div className="flex items-center gap-2">
-                    <span className="text-[10px] font-mono text-slate-500 dark:text-slate-400 w-16">Reported</span>
-                    <div className="flex-1 bg-slate-200 dark:bg-slate-900 h-3 rounded-full overflow-hidden border border-slate-300 dark:border-slate-800">
+                    <span className="text-[10px] text-slate-500 dark:text-slate-400 w-16">Reported</span>
+                    <div className="flex-1 bg-slate-200 dark:bg-slate-900 h-3 rounded-sm overflow-hidden border border-slate-300 dark:border-slate-800">
                       <div
-                        className="bg-gradient-to-r from-cyan-500 to-indigo-500 h-full rounded-full transition-all duration-500"
+                        className="bg-cyan-600 h-full rounded-sm transition-all"
                         style={{ width: `${knownPercent}%` }}
                       />
                     </div>
@@ -155,10 +151,10 @@ export const MaterialComparisonChart: React.FC<MaterialComparisonChartProps> = (
 
                   {metric === 'bandgap' && (
                     <div className="flex items-center gap-2">
-                      <span className="text-[10px] font-mono text-indigo-600 dark:text-indigo-400 w-16">KRR Predict</span>
-                      <div className="flex-1 bg-slate-200 dark:bg-slate-900 h-3 rounded-full overflow-hidden border border-slate-300 dark:border-slate-800">
+                      <span className="text-[10px] text-indigo-600 dark:text-indigo-400 w-16">KRR Predict</span>
+                      <div className="flex-1 bg-slate-200 dark:bg-slate-900 h-3 rounded-sm overflow-hidden border border-slate-300 dark:border-slate-800">
                         <div
-                          className="bg-gradient-to-r from-indigo-500 to-purple-500 h-full rounded-full transition-all duration-500"
+                          className="bg-cyan-600 h-full rounded-sm transition-all"
                           style={{ width: `${predPercent}%` }}
                         />
                       </div>

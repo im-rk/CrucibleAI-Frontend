@@ -26,7 +26,7 @@ export const RunModeBanner: React.FC<RunModeBannerProps> = ({ mode, warnings }) 
   return (
     <Card className={degraded ? 'border-amber-500/40 bg-amber-50/60 dark:bg-amber-950/20' : 'border-slate-200 dark:border-slate-800'}>
       <CardContent className="py-3 space-y-3">
-        <div className="flex flex-wrap items-center gap-2 text-xs font-mono">
+        <div className="flex flex-wrap items-center gap-2 text-xs">
           {degraded ? (
             <AlertTriangle className="w-4 h-4 text-amber-600 dark:text-amber-400" />
           ) : (
@@ -60,7 +60,7 @@ export const RunModeBanner: React.FC<RunModeBannerProps> = ({ mode, warnings }) 
             )}
             {keyMissing(mode) && (
               <>
-                Add <code className="font-mono">ANTHROPIC_API_KEY</code> and{' '}
+                Add <code className="font-mono">ANTHROPIC_API_KEY</code> or <code className="font-mono">GEMINI_API_KEY</code>, and{' '}
                 <code className="font-mono">MATERIALS_PROJECT_API_KEY</code> to the backend to enable the full pipeline.
               </>
             )}

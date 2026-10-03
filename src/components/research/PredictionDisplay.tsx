@@ -3,7 +3,7 @@ import { KRRPrediction, MaterialProperty } from '../../types/api';
 import { Card, CardHeader, CardTitle, CardContent } from '../common/Card';
 import { Badge } from '../common/Badge';
 import { getConfidenceBadgeColor } from '../../utils/formatters';
-import { Cpu, AlertCircle, Sparkles } from 'lucide-react';
+import { Cpu, AlertCircle, Info } from 'lucide-react';
 
 interface PredictionDisplayProps {
   predictions: Record<string, KRRPrediction>;
@@ -40,21 +40,21 @@ export const PredictionDisplay: React.FC<PredictionDisplayProps> = ({
             return (
               <div
                 key={formula}
-                className="bg-slate-50 dark:bg-slate-950/80 rounded-2xl p-4 border border-slate-200 dark:border-slate-800/80 hover:border-indigo-500/40 transition-all space-y-3 shadow-sm"
+                className="bg-slate-50 dark:bg-slate-950/80 rounded-md p-4 border border-slate-200 dark:border-slate-800/80 hover:border-indigo-500/40 transition-all space-y-3"
               >
                 {/* Header */}
                 <div className="flex items-center justify-between">
                   <span className="font-mono font-bold text-base text-cyan-700 dark:text-cyan-400">
                     {formula}
                   </span>
-                  <span className={`text-[11px] font-mono px-2 py-0.5 rounded-md border ${confidenceStyle.bg} ${confidenceStyle.text} ${confidenceStyle.border}`}>
+                  <span className={`text-[11px] px-2 py-0.5 rounded-md border ${confidenceStyle.bg} ${confidenceStyle.text} ${confidenceStyle.border}`}>
                     {pred.confidence || 'medium'} confidence
                   </span>
                 </div>
 
                 {/* Values comparison grid */}
-                <div className="grid grid-cols-2 gap-2 pt-1 font-mono">
-                  <div className="bg-white dark:bg-slate-900/90 p-2.5 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm">
+                <div className="grid grid-cols-2 gap-2 pt-1">
+                  <div className="bg-white dark:bg-slate-900/90 p-2.5 rounded-md border border-slate-200 dark:border-slate-800">
                     <span className="text-[10px] text-slate-500 dark:text-slate-400 uppercase tracking-wider block">KRR ML Predicted</span>
                     <span className="text-lg font-bold text-indigo-600 dark:text-indigo-400">
                       {pred.predicted_value} <span className="text-xs">{pred.unit}</span>
@@ -64,7 +64,7 @@ export const PredictionDisplay: React.FC<PredictionDisplayProps> = ({
                     </span>
                   </div>
 
-                  <div className="bg-white dark:bg-slate-900/90 p-2.5 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm">
+                  <div className="bg-white dark:bg-slate-900/90 p-2.5 rounded-md border border-slate-200 dark:border-slate-800">
                     <span className="text-[10px] text-slate-500 dark:text-slate-400 uppercase tracking-wider block">Reported (database / literature)</span>
                     <span className="text-lg font-bold text-slate-800 dark:text-slate-200">
                       {knownBgProp ? `${knownBgProp.value}` : 'N/A'}{' '}
@@ -74,9 +74,9 @@ export const PredictionDisplay: React.FC<PredictionDisplayProps> = ({
                 </div>
 
                 {/* Method & Note */}
-                <div className="space-y-1 pt-1 text-xs font-mono text-slate-500 dark:text-slate-400 border-t border-slate-200 dark:border-slate-800/60">
+                <div className="space-y-1 pt-1 text-xs text-slate-500 dark:text-slate-400 border-t border-slate-200 dark:border-slate-800/60">
                   <div className="flex items-center gap-1.5 text-slate-700 dark:text-slate-300">
-                    <Sparkles className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400" />
+                    <Info className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400" />
                     <span className="text-[11px]">{pred.method}</span>
                   </div>
                   {pred.note && (

@@ -2,7 +2,7 @@ import React from 'react';
 import { Confidence, Grounding, Hypothesis } from '../../types/api';
 import { Card, CardHeader, CardTitle, CardContent } from '../common/Card';
 import { Badge } from '../common/Badge';
-import { AlertTriangle, ExternalLink, FlaskConical, ShieldCheck, ShieldAlert, Sparkles } from 'lucide-react';
+import { AlertTriangle, ExternalLink, FlaskConical, ShieldCheck, ShieldAlert, Info } from 'lucide-react';
 
 interface HypothesesPanelProps {
   hypotheses: Hypothesis[];
@@ -26,7 +26,7 @@ export const HypothesesPanel: React.FC<HypothesesPanelProps> = ({ hypotheses, gr
     <Card className="border-slate-200 dark:border-slate-800">
       <CardHeader>
         <CardTitle icon={<FlaskConical className="w-5 h-5 text-cyan-600 dark:text-cyan-400" />}>
-          Testable Hypotheses
+          Hypotheses
         </CardTitle>
         <Badge
           variant={grounding.is_grounded ? 'emerald' : 'rose'}
@@ -51,13 +51,13 @@ export const HypothesesPanel: React.FC<HypothesesPanelProps> = ({ hypotheses, gr
         {hypotheses.map((h, i) => (
           <article
             key={i}
-            className="rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950/60 p-4 space-y-3"
+            className="rounded-md border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950/60 p-4 space-y-3"
           >
             <div className="flex flex-wrap items-center gap-2">
               <span className="font-mono text-xs text-slate-500">H{i + 1}</span>
               <Badge variant={CONFIDENCE_VARIANT[h.confidence]} size="sm">{h.confidence} confidence</Badge>
               {h.origin === 'template' && (
-                <Badge variant="slate" size="sm" icon={<Sparkles className="w-3 h-3" />}>template, not model reasoning</Badge>
+                <Badge variant="slate" size="sm" icon={<Info className="w-3 h-3" />}>template, not model reasoning</Badge>
               )}
               {h.grounded === false && (
                 <Badge variant="rose" size="sm" icon={<AlertTriangle className="w-3 h-3" />}>not supported by its evidence</Badge>
@@ -67,7 +67,7 @@ export const HypothesesPanel: React.FC<HypothesesPanelProps> = ({ hypotheses, gr
             <p className="text-sm sm:text-base text-slate-900 dark:text-slate-100 font-sans leading-relaxed">{h.statement}</p>
 
             <div className="text-xs font-sans space-y-1">
-              <p className="text-slate-500 uppercase text-[10px] font-mono tracking-wide">Evidence</p>
+              <p className="text-slate-500 uppercase text-[10px] tracking-wide">Evidence</p>
               {h.evidence.length === 0 ? (
                 <p className="text-rose-600 dark:text-rose-400">No cited evidence.</p>
               ) : (
@@ -100,7 +100,7 @@ export const HypothesesPanel: React.FC<HypothesesPanelProps> = ({ hypotheses, gr
               <p className="mt-1 text-slate-800 dark:text-slate-200">{h.suggested_experiment}</p>
             </div>
 
-            {h.grounding_note && <p className="text-[11px] font-mono text-slate-500">Grounding: {h.grounding_note}</p>}
+            {h.grounding_note && <p className="text-[11px] text-slate-500">Grounding: {h.grounding_note}</p>}
           </article>
         ))}
       </CardContent>

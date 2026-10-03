@@ -32,16 +32,16 @@ export const CitationsPanel: React.FC<CitationsPanelProps> = ({
     <Card className="border-slate-200 dark:border-slate-800">
       <CardHeader>
         <CardTitle icon={<BookOpen className="w-5 h-5 text-cyan-600 dark:text-cyan-400" />}>
-          Retrieved Literature Evidence & Paper Citations
+          Evidence from the literature
         </CardTitle>
-        <span className="text-xs font-mono text-cyan-700 dark:text-cyan-400 bg-cyan-500/10 px-2.5 py-1 rounded border border-cyan-500/30">
+        <span className="text-xs text-cyan-700 dark:text-cyan-400 bg-cyan-500/10 px-2.5 py-1 rounded border border-cyan-500/30">
           ChromaDB Vector Store ({filteredResults.length} of {searchResults.length} chunks)
         </span>
       </CardHeader>
 
       <CardContent className="space-y-5">
         {/* Interactive Filter Bar */}
-        <div className="p-3.5 bg-slate-50 dark:bg-slate-950/80 rounded-xl border border-slate-200 dark:border-slate-800/80 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 text-xs font-mono shadow-sm">
+        <div className="p-3.5 bg-slate-50 dark:bg-slate-950/80 rounded-md border border-slate-200 dark:border-slate-800/80 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 text-xs">
           {/* Text Search Filter */}
           <div className="relative flex-1">
             <Search className="w-4 h-4 text-slate-400 absolute left-3 top-2.5 pointer-events-none" />
@@ -55,7 +55,7 @@ export const CitationsPanel: React.FC<CitationsPanelProps> = ({
           </div>
 
           {/* Similarity Threshold Slider */}
-          <div className="flex items-center gap-2 font-mono text-slate-600 dark:text-slate-400 shrink-0">
+          <div className="flex items-center gap-2 text-slate-600 dark:text-slate-400 shrink-0">
             <SlidersHorizontal className="w-4 h-4 text-cyan-600 dark:text-cyan-400" />
             <span>Min Similarity:</span>
             <input
@@ -79,7 +79,7 @@ export const CitationsPanel: React.FC<CitationsPanelProps> = ({
             ))}
           </div>
         ) : (
-          <div className="p-8 text-center bg-slate-50 dark:bg-slate-950/60 rounded-xl border border-slate-200 dark:border-slate-800 text-slate-500 font-mono text-xs space-y-2">
+          <div className="p-8 text-center bg-slate-50 dark:bg-slate-950/60 rounded-md border border-slate-200 dark:border-slate-800 text-slate-500 text-xs space-y-2">
             <Filter className="w-6 h-6 text-slate-400 dark:text-slate-600 mx-auto" />
             <p>No literature paper chunks match your active filters.</p>
             <button
