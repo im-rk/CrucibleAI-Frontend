@@ -23,8 +23,6 @@ import { useResearch } from './hooks/useResearch';
 import { useHealth } from './hooks/useHealth';
 import { useTheme } from './context/ThemeContext';
 import { exportResearchMarkdown, exportResearchJSON } from './utils/exportReport';
-import { sounds } from './utils/audio';
-import { Layers, Cpu, BookOpen, LayoutDashboard, BarChart3, Download, FileCode, Radar, FlaskConical, BookMarked } from 'lucide-react';
 import { clsx } from 'clsx';
 
 type ResultTab =
@@ -49,16 +47,16 @@ export function App() {
     if (result) exportResearchJSON(result);
   };
 
-  const tabs: { id: ResultTab; label: string; icon: React.ElementType }[] = result
+  const tabs: { id: ResultTab; label: string }[] = result
     ? [
-        { id: 'overview', label: 'Overview', icon: LayoutDashboard },
-        { id: 'candidates', label: `Candidates (${result.candidates.length})`, icon: Layers },
-        { id: 'hypotheses', label: `Hypotheses (${result.hypotheses.length})`, icon: FlaskConical },
-        { id: 'predictions', label: `ML Predictions (${Object.keys(result.krr_predictions).length})`, icon: Cpu },
-        { id: 'analytics', label: 'Property Charts', icon: BarChart3 },
-        { id: 'radar', label: 'Radar', icon: Radar },
-        { id: 'literature', label: `Evidence (${result.search_results.length})`, icon: BookOpen },
-        { id: 'references', label: `References (${result.citations.length})`, icon: BookMarked },
+        { id: 'overview', label: 'Overview' },
+        { id: 'candidates', label: `Candidates (${result.candidates.length})` },
+        { id: 'hypotheses', label: `Hypotheses (${result.hypotheses.length})` },
+        { id: 'predictions', label: `Predictions (${Object.keys(result.krr_predictions).length})` },
+        { id: 'analytics', label: 'Charts' },
+        { id: 'radar', label: 'Radar' },
+        { id: 'literature', label: `Evidence (${result.search_results.length})` },
+        { id: 'references', label: `References (${result.citations.length})` },
       ]
     : [];
 
@@ -69,12 +67,10 @@ export function App() {
         onOpenTools={() => setIsToolsOpen(true)}
         onNewResearch={resetResearch}
         onOpenCommandPalette={() => setIsCommandPaletteOpen(true)}
-        onExportMarkdown={handleExportMarkdown}
         hasActiveResearch={status !== 'IDLE'}
-        hasResults={hasResult}
       />
 
-      <div className="space-y-6 pt-4">
+      <div className="space-y-8">
         <ResearchInput onSubmit={(q, maxRes) => executeResearch(q, maxRes)} isLoading={isLoading} initialQuery={query} />
 
         {status === 'IDLE' && (
@@ -89,60 +85,40 @@ export function App() {
         {status === 'ERROR' && error && <ErrorState error={error} onRetry={() => query && executeResearch(query)} />}
 
         {hasResult && result && (
-          <div className="space-y-6 animate-in fade-in duration-300">
+          <div className="space-y-6">
             <RunModeBanner mode={result.mode} warnings={result.warnings} />
             <HypothesisCard hypothesis={result.hypothesis} query={result.query} sessionId={result.session_id} />
 
-            <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 border-b border-slate-200 dark:border-slate-800 pb-3">
-              <div className="flex items-center gap-2 overflow-x-auto" role="tablist">
+            <div className="flex flex-wrap items-end justify-between gap-x-6 gap-y-2 border-b border-slate-200 dark:border-slate-800">
+              <div className="flex gap-1 overflow-x-auto" role="tablist">
                 {tabs.map((tab) => {
-                  const Icon = tab.icon;
                   const isActive = activeTab === tab.id;
                   return (
                     <button
                       key={tab.id}
                       role="tab"
                       aria-selected={isActive}
-                      onClick={() => {
-                        sounds.playClick();
-                        setActiveTab(tab.id);
-                      }}
+                      onClick={() => setActiveTab(tab.id)}
                       className={clsx(
-                        'px-4 py-2 text-xs font-mono rounded-lg transition-all flex items-center gap-2 border whitespace-nowrap',
+                        'px-3 py-2 text-sm whitespace-nowrap border-b-2 -mb-px',
                         isActive
-                          ? 'bg-cyan-500/20 text-cyan-700 dark:text-cyan-300 border-cyan-500/40 font-semibold shadow-md shadow-cyan-500/10'
-                          : 'bg-white/60 dark:bg-slate-900/60 text-slate-600 dark:text-slate-400 border-slate-200 dark:border-slate-800 hover:text-slate-900 dark:hover:text-slate-200',
+                          ? 'border-cyan-700 text-slate-900 dark:text-slate-100 dark:border-cyan-400 font-medium'
+                          : 'border-transparent text-slate-600 hover:text-slate-900 dark:text-slate-400 dark:hover:text-slate-100',
                       )}
                     >
-                      <Icon className="w-4 h-4" />
-                      <span>{tab.label}</span>
+                      {tab.label}
                     </button>
                   );
                 })}
               </div>
 
-              <div className="flex items-center gap-2 shrink-0 font-mono text-xs">
-                <button
-                  onClick={() => {
-                    sounds.playClick();
-                    handleExportMarkdown();
-                  }}
-                  className="px-3 py-1.5 rounded-lg bg-emerald-500/10 hover:bg-emerald-500/20 border border-emerald-500/30 text-emerald-700 dark:text-emerald-300 flex items-center gap-1.5 transition-colors"
-                  title="Export Markdown Report (.md)"
-                >
-                  <Download className="w-3.5 h-3.5" />
-                  <span>Report .md</span>
+              <div className="flex items-center gap-4 pb-2 text-sm">
+                <span className="text-slate-500">Export</span>
+                <button onClick={handleExportMarkdown} className="underline underline-offset-4 hover:text-cyan-700 dark:hover:text-cyan-400">
+                  Markdown
                 </button>
-                <button
-                  onClick={() => {
-                    sounds.playClick();
-                    handleExportJSON();
-                  }}
-                  className="px-3 py-1.5 rounded-lg bg-slate-100 dark:bg-slate-900 hover:bg-slate-200 dark:hover:bg-slate-800 border border-slate-300 dark:border-slate-800 text-slate-700 dark:text-slate-300 flex items-center gap-1.5 transition-colors"
-                  title="Export JSON Dataset (.json)"
-                >
-                  <FileCode className="w-3.5 h-3.5 text-cyan-600 dark:text-cyan-400" />
-                  <span>JSON</span>
+                <button onClick={handleExportJSON} className="underline underline-offset-4 hover:text-cyan-700 dark:hover:text-cyan-400">
+                  JSON
                 </button>
               </div>
             </div>
@@ -211,6 +187,7 @@ export function App() {
       <CommandPalette
         isOpen={isCommandPaletteOpen}
         onClose={() => setIsCommandPaletteOpen(false)}
+        onOpen={() => setIsCommandPaletteOpen(true)}
         onSelectQuery={(q) => executeResearch(q)}
         onOpenTools={() => setIsToolsOpen(true)}
         onToggleTheme={toggleMode}

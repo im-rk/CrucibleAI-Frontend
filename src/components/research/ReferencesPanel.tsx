@@ -12,7 +12,7 @@ export const ReferencesPanel: React.FC<ReferencesPanelProps> = ({ citations }) =
   <Card className="border-slate-200 dark:border-slate-800">
     <CardHeader>
       <CardTitle icon={<BookMarked className="w-5 h-5 text-cyan-600 dark:text-cyan-400" />}>References</CardTitle>
-      <span className="text-xs font-mono text-slate-500">{citations.length} sources</span>
+      <span className="text-xs text-slate-500">{citations.length} sources</span>
     </CardHeader>
     <CardContent>
       {citations.length === 0 ? (
@@ -32,7 +32,7 @@ export const ReferencesPanel: React.FC<ReferencesPanelProps> = ({ citations }) =
                     c.title
                   )}
                 </p>
-                <p className="text-xs text-slate-500 dark:text-slate-400 font-mono">
+                <p className="text-xs text-slate-500 dark:text-slate-400">
                   {[c.authors, c.year, c.doi ? `DOI ${c.doi}` : c.source_id].filter(Boolean).join(' · ')}
                 </p>
                 <div className="flex flex-wrap gap-1.5">

@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { MaterialProperty, KRRPrediction } from '../../types/api';
 import { Card, CardHeader, CardTitle, CardContent } from '../common/Card';
-import { Radar, Sparkles } from 'lucide-react';
+import { Radar, Info } from 'lucide-react';
 import { useTheme } from '../../context/ThemeContext';
 
 interface MaterialRadarChartProps {
@@ -149,18 +149,18 @@ export const MaterialRadarChart: React.FC<MaterialRadarChartProps> = ({
     <Card className="border-slate-200 dark:border-slate-800">
       <CardHeader>
         <CardTitle icon={<Radar className="w-5 h-5 text-cyan-600 dark:text-cyan-400" />}>
-          Multi-Axis Scientific Radar Profile
+          Property profile
         </CardTitle>
 
         {/* Candidate Selector Pills */}
-        <div className="flex items-center gap-1.5 font-mono text-xs overflow-x-auto">
+        <div className="flex items-center gap-1.5 text-xs overflow-x-auto">
           {candidateFormulas.map((formula) => (
             <button
               key={formula}
               onClick={() => setSelectedFormula(formula)}
               className={`px-2.5 py-1 rounded-lg border transition-all ${
                 selectedFormula === formula
-                  ? 'bg-cyan-500/20 text-cyan-600 dark:text-cyan-300 border-cyan-500/40 font-bold shadow-sm'
+                  ? 'bg-cyan-500/20 text-cyan-600 dark:text-cyan-300 border-cyan-500/40 font-bold'
                   : 'bg-slate-100 dark:bg-slate-950 text-slate-600 dark:text-slate-400 border-slate-300 dark:border-slate-800 hover:text-slate-900 dark:hover:text-slate-200'
               }`}
             >
@@ -172,8 +172,8 @@ export const MaterialRadarChart: React.FC<MaterialRadarChartProps> = ({
 
       <CardContent className="flex flex-col items-center justify-center p-4">
         <canvas ref={canvasRef} className="max-w-full h-auto" />
-        <p className="mt-2 text-xs font-mono text-slate-500 dark:text-slate-400 text-center flex items-center gap-1.5">
-          <Sparkles className="w-3.5 h-3.5 text-cyan-500" />
+        <p className="mt-2 text-xs text-slate-500 dark:text-slate-400 text-center flex items-center gap-1.5">
+          <Info className="w-3.5 h-3.5 text-cyan-500" />
           Radar metric profile for <span className="font-bold text-cyan-600 dark:text-cyan-300">{selectedFormula}</span> across 5 scientific descriptors.
         </p>
       </CardContent>

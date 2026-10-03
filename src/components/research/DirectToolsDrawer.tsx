@@ -1,9 +1,8 @@
-import React, { useState } from 'react';
-import { X, Cpu, Search, Sparkles, Database, AlertCircle, Atom } from 'lucide-react';
+import React, { useEffect, useState } from 'react';
+import { X, Search, AlertCircle } from 'lucide-react';
 import { Button } from '../common/Button';
 import { api } from '../../services/api';
 import { KRRPrediction, MaterialProperty } from '../../types/api';
-import { sounds } from '../../utils/audio';
 
 interface DirectToolsDrawerProps {
   isOpen: boolean;
@@ -32,12 +31,18 @@ export const DirectToolsDrawer: React.FC<DirectToolsDrawerProps> = ({
   // Featurizer state
   const [featFormula, setFeatFormula] = useState('Li7La3Zr2O12');
 
+  useEffect(() => {
+    if (!isOpen) return;
+    const onKey = (e: KeyboardEvent) => e.key === 'Escape' && onClose();
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [isOpen, onClose]);
+
   if (!isOpen) return null;
 
   const handlePredict = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!predictFormula.trim()) return;
-    sounds.playClick();
     setPredictLoading(true);
     setPredictError(null);
     setPredictResult(null);
@@ -45,7 +50,6 @@ export const DirectToolsDrawer: React.FC<DirectToolsDrawerProps> = ({
     try {
       const res = await api.predictProperty(predictFormula.trim(), propertyName);
       setPredictResult(res);
-      sounds.playSuccess();
     } catch (err) {
       setPredictError(err instanceof Error ? err.message : 'KRR prediction failed');
     } finally {
@@ -56,7 +60,6 @@ export const DirectToolsDrawer: React.FC<DirectToolsDrawerProps> = ({
   const handleLookup = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!lookupFormula.trim()) return;
-    sounds.playClick();
     setLookupLoading(true);
     setLookupError(null);
     setLookupProperties([]);
@@ -64,7 +67,6 @@ export const DirectToolsDrawer: React.FC<DirectToolsDrawerProps> = ({
     try {
       const res = await api.lookupMaterial(lookupFormula.trim());
       setLookupProperties(res.properties || []);
-      sounds.playSuccess();
     } catch (err) {
       setLookupError(err instanceof Error ? err.message : 'Materials lookup failed');
     } finally {
@@ -73,19 +75,18 @@ export const DirectToolsDrawer: React.FC<DirectToolsDrawerProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 overflow-hidden bg-slate-950/70 dark:bg-slate-950/80 backdrop-blur-md flex justify-end">
-      <div className="w-full max-w-md bg-white dark:bg-slate-900 border-l border-slate-200 dark:border-slate-800 shadow-2xl h-full flex flex-col animate-in slide-in-from-right duration-200 text-slate-900 dark:text-slate-100">
+    <div role="dialog" aria-modal="true" aria-label="Lookup and predict" className="fixed inset-0 z-50 overflow-hidden bg-slate-950/70 dark:bg-slate-950/80 flex justify-end">
+      <div className="w-full max-w-md bg-white dark:bg-slate-900 border-l border-slate-200 dark:border-slate-800 h-full flex flex-col text-slate-900 dark:text-slate-100">
         {/* Drawer Header */}
         <div className="px-5 py-4 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between bg-slate-50 dark:bg-slate-950/80">
           <div className="flex items-center gap-2">
-            <Cpu className="w-5 h-5 text-cyan-600 dark:text-cyan-400" />
+            
             <h3 className="text-base font-bold text-slate-900 dark:text-slate-100 font-sans">
-              Direct Backend Helper Tools
+              Lookup & predict
             </h3>
           </div>
           <button
             onClick={() => {
-              sounds.playClick();
               onClose();
             }}
             className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 p-1.5 rounded-lg hover:bg-slate-200 dark:hover:bg-slate-800 transition-colors"
@@ -95,47 +96,44 @@ export const DirectToolsDrawer: React.FC<DirectToolsDrawerProps> = ({
         </div>
 
         {/* Tab Selection */}
-        <div className="flex border-b border-slate-200 dark:border-slate-800 bg-slate-100 dark:bg-slate-950/40 p-2 gap-1.5 font-mono text-xs">
+        <div className="flex border-b border-slate-200 dark:border-slate-800 bg-slate-100 dark:bg-slate-950/40 p-2 gap-1.5 text-xs">
           <button
             onClick={() => {
-              sounds.playClick();
               setActiveTab('predict');
             }}
             className={`flex-1 py-2 rounded-lg border transition-all flex items-center justify-center gap-1 ${
               activeTab === 'predict'
-                ? 'bg-indigo-500/20 text-indigo-700 dark:text-indigo-300 border-indigo-500/40 font-semibold shadow-sm'
+                ? 'bg-indigo-500/20 text-indigo-700 dark:text-indigo-300 border-indigo-500/40 font-semibold'
                 : 'text-slate-600 dark:text-slate-400 border-transparent hover:text-slate-900 dark:hover:text-slate-200'
             }`}
           >
-            <Sparkles className="w-3.5 h-3.5" />
+            
             KRR ML
           </button>
           <button
             onClick={() => {
-              sounds.playClick();
               setActiveTab('lookup');
             }}
             className={`flex-1 py-2 rounded-lg border transition-all flex items-center justify-center gap-1 ${
               activeTab === 'lookup'
-                ? 'bg-cyan-500/20 text-cyan-700 dark:text-cyan-300 border-cyan-500/40 font-semibold shadow-sm'
+                ? 'bg-cyan-500/20 text-cyan-700 dark:text-cyan-300 border-cyan-500/40 font-semibold'
                 : 'text-slate-600 dark:text-slate-400 border-transparent hover:text-slate-900 dark:hover:text-slate-200'
             }`}
           >
-            <Database className="w-3.5 h-3.5" />
+            
             MP DB
           </button>
           <button
             onClick={() => {
-              sounds.playClick();
               setActiveTab('featurizer');
             }}
             className={`flex-1 py-2 rounded-lg border transition-all flex items-center justify-center gap-1 ${
               activeTab === 'featurizer'
-                ? 'bg-emerald-500/20 text-emerald-700 dark:text-emerald-300 border-emerald-500/40 font-semibold shadow-sm'
+                ? 'bg-emerald-500/20 text-emerald-700 dark:text-emerald-300 border-emerald-500/40 font-semibold'
                 : 'text-slate-600 dark:text-slate-400 border-transparent hover:text-slate-900 dark:hover:text-slate-200'
             }`}
           >
-            <Atom className="w-3.5 h-3.5" />
+            
             Featurizer
           </button>
         </div>
@@ -145,12 +143,12 @@ export const DirectToolsDrawer: React.FC<DirectToolsDrawerProps> = ({
           {activeTab === 'predict' && (
             <div className="space-y-4">
               <p className="text-xs text-slate-500 dark:text-slate-400">
-                Directly run Kernel Ridge Regression ML property predictor on any chemical formula.
+                Estimate a property from the chemical formula alone (kernel ridge regression). It is an estimate with an uncertainty, not a measurement.
               </p>
 
               <form onSubmit={handlePredict} className="space-y-3">
                 <div>
-                  <label className="block text-xs font-mono text-slate-700 dark:text-slate-300 mb-1">
+                  <label className="block text-xs text-slate-700 dark:text-slate-300 mb-1">
                     Chemical Formula
                   </label>
                   <input
@@ -158,18 +156,18 @@ export const DirectToolsDrawer: React.FC<DirectToolsDrawerProps> = ({
                     value={predictFormula}
                     onChange={(e) => setPredictFormula(e.target.value)}
                     placeholder="e.g. GaN, Li7La3Zr2O12, CsPbI3"
-                    className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-800 rounded-lg px-3 py-2 text-sm text-slate-900 dark:text-slate-100 font-mono focus:border-indigo-500 focus:outline-none"
+                    className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-800 rounded-lg px-3 py-2 text-sm text-slate-900 dark:text-slate-100 focus:border-indigo-500 focus:outline-none"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-xs font-mono text-slate-700 dark:text-slate-300 mb-1">
+                  <label className="block text-xs text-slate-700 dark:text-slate-300 mb-1">
                     Target Property
                   </label>
                   <select
                     value={propertyName}
                     onChange={(e) => setPropertyName(e.target.value)}
-                    className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-800 rounded-lg px-3 py-2 text-sm text-slate-900 dark:text-slate-100 font-mono focus:border-indigo-500 focus:outline-none"
+                    className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-800 rounded-lg px-3 py-2 text-sm text-slate-900 dark:text-slate-100 focus:border-indigo-500 focus:outline-none"
                   >
                     <option value="band_gap">band_gap (Bandgap eV)</option>
                     <option value="formation_energy_per_atom">formation_energy (eV/atom)</option>
@@ -181,9 +179,9 @@ export const DirectToolsDrawer: React.FC<DirectToolsDrawerProps> = ({
                   variant="primary"
                   className="w-full"
                   isLoading={predictLoading}
-                  icon={<Sparkles className="w-4 h-4" />}
+                  
                 >
-                  Run KRR Prediction
+                  Predict
                 </Button>
               </form>
 
@@ -195,7 +193,7 @@ export const DirectToolsDrawer: React.FC<DirectToolsDrawerProps> = ({
               )}
 
               {predictResult && (
-                <div className="p-4 bg-slate-50 dark:bg-slate-950 rounded-xl border border-indigo-500/30 space-y-3 font-mono text-xs shadow-sm">
+                <div className="p-4 bg-slate-50 dark:bg-slate-950 rounded-md border border-indigo-500/30 space-y-3 text-xs">
                   <div className="flex items-center justify-between border-b border-slate-200 dark:border-slate-800 pb-2">
                     <span className="text-cyan-700 dark:text-cyan-400 font-bold">{predictResult.formula}</span>
                     <span className="text-indigo-700 dark:text-indigo-400 font-bold text-sm">
@@ -220,7 +218,7 @@ export const DirectToolsDrawer: React.FC<DirectToolsDrawerProps> = ({
 
               <form onSubmit={handleLookup} className="space-y-3">
                 <div>
-                  <label className="block text-xs font-mono text-slate-700 dark:text-slate-300 mb-1">
+                  <label className="block text-xs text-slate-700 dark:text-slate-300 mb-1">
                     Chemical Formula
                   </label>
                   <input
@@ -228,7 +226,7 @@ export const DirectToolsDrawer: React.FC<DirectToolsDrawerProps> = ({
                     value={lookupFormula}
                     onChange={(e) => setLookupFormula(e.target.value)}
                     placeholder="e.g. GaN, Li7La3Zr2O12"
-                    className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-800 rounded-lg px-3 py-2 text-sm text-slate-900 dark:text-slate-100 font-mono focus:border-cyan-500 focus:outline-none"
+                    className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-800 rounded-lg px-3 py-2 text-sm text-slate-900 dark:text-slate-100 focus:border-cyan-500 focus:outline-none"
                   />
                 </div>
 
@@ -252,11 +250,11 @@ export const DirectToolsDrawer: React.FC<DirectToolsDrawerProps> = ({
 
               {lookupProperties.length > 0 && (
                 <div className="space-y-2">
-                  <span className="text-xs font-mono text-cyan-700 dark:text-cyan-400 font-semibold">
+                  <span className="text-xs text-cyan-700 dark:text-cyan-400 font-semibold">
                     Found {lookupProperties.length} property records:
                   </span>
                   {lookupProperties.map((prop, idx) => (
-                    <div key={idx} className="p-3 bg-slate-50 dark:bg-slate-950 rounded-lg border border-slate-200 dark:border-slate-800 font-mono text-xs space-y-1 shadow-sm">
+                    <div key={idx} className="p-3 bg-slate-50 dark:bg-slate-950 rounded-lg border border-slate-200 dark:border-slate-800 text-xs space-y-1">
                       <div className="flex items-center justify-between text-slate-900 dark:text-slate-200 font-semibold">
                         <span>{prop.property_name}</span>
                         <span className="text-cyan-700 dark:text-cyan-400">{prop.value} {prop.unit}</span>
@@ -279,18 +277,18 @@ export const DirectToolsDrawer: React.FC<DirectToolsDrawerProps> = ({
               </p>
 
               <div>
-                <label className="block text-xs font-mono text-slate-700 dark:text-slate-300 mb-1">
+                <label className="block text-xs text-slate-700 dark:text-slate-300 mb-1">
                   Chemical Formula
                 </label>
                 <input
                   type="text"
                   value={featFormula}
                   onChange={(e) => setFeatFormula(e.target.value)}
-                  className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-800 rounded-lg px-3 py-2 text-sm text-slate-900 dark:text-slate-100 font-mono focus:border-emerald-500 focus:outline-none"
+                  className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-800 rounded-lg px-3 py-2 text-sm text-slate-900 dark:text-slate-100 focus:border-emerald-500 focus:outline-none"
                 />
               </div>
 
-              <div className="p-4 bg-slate-50 dark:bg-slate-950 rounded-xl border border-slate-200 dark:border-slate-800 space-y-3 font-mono text-xs shadow-sm">
+              <div className="p-4 bg-slate-50 dark:bg-slate-950 rounded-md border border-slate-200 dark:border-slate-800 space-y-3 text-xs">
                 <span className="text-emerald-700 dark:text-emerald-400 font-bold block border-b border-slate-200 dark:border-slate-800 pb-2">
                   Magpie Feature Matrix for {featFormula || 'N/A'}
                 </span>
