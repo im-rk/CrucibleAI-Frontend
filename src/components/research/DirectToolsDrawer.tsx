@@ -13,7 +13,7 @@ export const DirectToolsDrawer: React.FC<DirectToolsDrawerProps> = ({
   isOpen,
   onClose,
 }) => {
-  const [activeTab, setActiveTab] = useState<'predict' | 'lookup' | 'featurizer'>('predict');
+  const [activeTab, setActiveTab] = useState<'predict' | 'lookup'>('predict');
 
   // KRR Predict state
   const [predictFormula, setPredictFormula] = useState('GaN');
@@ -28,8 +28,6 @@ export const DirectToolsDrawer: React.FC<DirectToolsDrawerProps> = ({
   const [lookupLoading, setLookupLoading] = useState(false);
   const [lookupError, setLookupError] = useState<string | null>(null);
 
-  // Featurizer state
-  const [featFormula, setFeatFormula] = useState('Li7La3Zr2O12');
 
   useEffect(() => {
     if (!isOpen) return;
@@ -108,7 +106,7 @@ export const DirectToolsDrawer: React.FC<DirectToolsDrawerProps> = ({
             }`}
           >
             
-            KRR ML
+            Predict
           </button>
           <button
             onClick={() => {
@@ -121,20 +119,7 @@ export const DirectToolsDrawer: React.FC<DirectToolsDrawerProps> = ({
             }`}
           >
             
-            MP DB
-          </button>
-          <button
-            onClick={() => {
-              setActiveTab('featurizer');
-            }}
-            className={`flex-1 py-2 rounded-lg border transition-all flex items-center justify-center gap-1 ${
-              activeTab === 'featurizer'
-                ? 'bg-emerald-500/20 text-emerald-700 dark:text-emerald-300 border-emerald-500/40 font-semibold'
-                : 'text-slate-600 dark:text-slate-400 border-transparent hover:text-slate-900 dark:hover:text-slate-200'
-            }`}
-          >
-            
-            Featurizer
+            Database
           </button>
         </div>
 
@@ -270,50 +255,6 @@ export const DirectToolsDrawer: React.FC<DirectToolsDrawerProps> = ({
             </div>
           )}
 
-          {activeTab === 'featurizer' && (
-            <div className="space-y-4">
-              <p className="text-xs text-slate-500 dark:text-slate-400">
-                Compositional descriptor featurizer preview (Magpie elemental vector features).
-              </p>
-
-              <div>
-                <label className="block text-xs text-slate-700 dark:text-slate-300 mb-1">
-                  Chemical Formula
-                </label>
-                <input
-                  type="text"
-                  value={featFormula}
-                  onChange={(e) => setFeatFormula(e.target.value)}
-                  className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-800 rounded-lg px-3 py-2 text-sm text-slate-900 dark:text-slate-100 focus:border-emerald-500 focus:outline-none"
-                />
-              </div>
-
-              <div className="p-4 bg-slate-50 dark:bg-slate-950 rounded-md border border-slate-200 dark:border-slate-800 space-y-3 text-xs">
-                <span className="text-emerald-700 dark:text-emerald-400 font-bold block border-b border-slate-200 dark:border-slate-800 pb-2">
-                  Magpie Feature Matrix for {featFormula || 'N/A'}
-                </span>
-
-                <div className="space-y-2 text-slate-700 dark:text-slate-300">
-                  <div className="flex justify-between">
-                    <span className="text-slate-500">Atomic Number Avg:</span>
-                    <span>32.4</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-slate-500">Electronegativity Avg:</span>
-                    <span>2.15</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-slate-500">Valence Electrons:</span>
-                    <span>16</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-slate-500">Feature Vector Dims:</span>
-                    <span className="text-emerald-700 dark:text-emerald-400 font-bold">20-D Dense Vector</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-          )}
         </div>
       </div>
     </div>
