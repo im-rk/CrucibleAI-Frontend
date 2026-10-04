@@ -7,10 +7,10 @@ interface EmptyStateProps {
 }
 
 export const EmptyState: React.FC<EmptyStateProps> = ({ corpus, health }) => {
-  const llmOn = !!health?.llm && !health.llm.startsWith('not configured');
+  const llmOn = !!health?.llm && !/^(unavailable|not configured)/i.test(health.llm);
   const rows: [string, string][] = [
     ['Papers', corpus ? `${corpus.total_papers ?? '—'} arXiv papers, ${corpus.total_chunks} indexed passages` : 'Unknown'],
-    ['Language model', llmOn ? String(health?.llm) : 'Not configured. Rules are used instead, with lower confidence'],
+    ['Language model', llmOn ? String(health?.llm) : 'Not available. Rules are used instead, with lower confidence'],
     ['Property database', health?.materials_project_api ?? 'Unknown'],
   ];
 
