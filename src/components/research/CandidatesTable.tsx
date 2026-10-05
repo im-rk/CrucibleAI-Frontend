@@ -25,10 +25,10 @@ const STATUS_BADGE: Record<CandidateStatus, { variant: 'emerald' | 'amber' | 'ro
 const CRITERION_ICON: Record<CriterionStatus, { icon: React.ElementType; className: string; text: string }> = {
   met: { icon: CheckCircle2, className: 'text-emerald-600 dark:text-emerald-400', text: 'Met' },
   not_met: { icon: XCircle, className: 'text-rose-600 dark:text-rose-400', text: 'Not met' },
-  missing: { icon: HelpCircle, className: 'text-slate-400', text: 'No data' },
+  missing: { icon: HelpCircle, className: 'text-slate-500', text: 'No data' },
   predicted_met: { icon: Info, className: 'text-indigo-600 dark:text-indigo-400', text: 'Predicted to meet (ML estimate)' },
   predicted_not_met: { icon: Info, className: 'text-rose-500', text: 'Predicted not to meet (ML estimate)' },
-  unverified: { icon: MinusCircle, className: 'text-slate-400', text: 'Cannot be verified from data' },
+  unverified: { icon: MinusCircle, className: 'text-slate-500', text: 'Cannot be verified from data' },
 };
 
 function formatValue(value: number | null, unit: string): string {
@@ -129,7 +129,7 @@ export const CandidatesTable: React.FC<CandidatesTableProps> = ({ candidates, pr
                       </td>
                       <td className="py-3.5 px-4">
                         <div className="flex items-center gap-1.5">
-                          {cand.criteria.length === 0 ? <span className="text-slate-400 text-xs">none</span> : cand.criteria.map((r, i) => <CriterionIcon key={i} result={r} />)}
+                          {cand.criteria.length === 0 ? <span className="text-slate-500 text-xs">none</span> : cand.criteria.map((r, i) => <CriterionIcon key={i} result={r} />)}
                         </div>
                       </td>
                       <td className="py-3.5 px-4">
@@ -140,7 +140,7 @@ export const CandidatesTable: React.FC<CandidatesTableProps> = ({ candidates, pr
                           {cand.score.toFixed(2)}
                         </div>
                       </td>
-                      <td className="py-3.5 px-4 text-right text-slate-400">
+                      <td className="py-3.5 px-4 text-right text-slate-500">
                         {isOpen ? <ChevronUp className="w-4 h-4 inline" /> : <ChevronDown className="w-4 h-4 inline" />}
                       </td>
                     </tr>
@@ -183,7 +183,7 @@ export const CandidatesTable: React.FC<CandidatesTableProps> = ({ candidates, pr
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                               <div className="p-3 bg-slate-100 dark:bg-slate-950 rounded-lg border border-slate-200 dark:border-slate-800 space-y-1">
                                 <span className="text-slate-500 uppercase text-[10px]">Reported properties</span>
-                                {props.length === 0 && <p className="text-slate-400">none</p>}
+                                {props.length === 0 && <p className="text-slate-500">none</p>}
                                 {props.map((p, i) => (
                                   <p key={i} className="text-slate-800 dark:text-slate-200">
                                     {p.property_name}: {p.value} {p.unit}
@@ -200,7 +200,7 @@ export const CandidatesTable: React.FC<CandidatesTableProps> = ({ candidates, pr
                               </div>
                               <div className="p-3 bg-slate-100 dark:bg-slate-950 rounded-lg border border-slate-200 dark:border-slate-800 space-y-1">
                                 <span className="text-slate-500 uppercase text-[10px]">Supporting literature</span>
-                                {cand.sources.length === 0 && <p className="text-slate-400">none in the retrieved papers</p>}
+                                {cand.sources.length === 0 && <p className="text-slate-500">none in the retrieved papers</p>}
                                 {cand.sources.map((s, i) => (
                                   <p key={i} className="text-slate-800 dark:text-slate-200 font-sans">
                                     {s.title || s.source_id}

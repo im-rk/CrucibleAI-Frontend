@@ -49,9 +49,9 @@ export const PaperCard: React.FC<PaperCardProps> = ({ chunk }) => {
         {/* Metadata info */}
         <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-slate-500 dark:text-slate-400 mb-3">
           <span>{authorsStr}</span>
-          <span className="text-slate-400 dark:text-slate-600">•</span>
+          <span className="text-slate-500 dark:text-slate-600">•</span>
           <span>{meta.year || 2026}</span>
-          <span className="text-slate-400 dark:text-slate-600">•</span>
+          <span className="text-slate-500 dark:text-slate-600">•</span>
           <span className="text-cyan-700 dark:text-cyan-300 bg-slate-200 dark:bg-slate-900 px-1.5 py-0.5 rounded border border-slate-300 dark:border-slate-800 text-[11px]">
             {meta.section || 'General'}
           </span>

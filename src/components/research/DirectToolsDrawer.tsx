@@ -87,7 +87,7 @@ export const DirectToolsDrawer: React.FC<DirectToolsDrawerProps> = ({
             onClick={() => {
               onClose();
             }}
-            className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 p-1.5 rounded-lg hover:bg-slate-200 dark:hover:bg-slate-800 transition-colors"
+            className="text-slate-500 hover:text-slate-600 dark:hover:text-slate-200 p-1.5 rounded-lg hover:bg-slate-200 dark:hover:bg-slate-800 transition-colors"
           >
             <X className="w-5 h-5" />
           </button>
@@ -186,8 +186,8 @@ export const DirectToolsDrawer: React.FC<DirectToolsDrawerProps> = ({
                     </span>
                   </div>
                   <div className="space-y-1 text-slate-600 dark:text-slate-400">
-                    <p><span className="text-slate-400 dark:text-slate-500">Method:</span> {predictResult.method}</p>
-                    <p><span className="text-slate-400 dark:text-slate-500">Confidence:</span> {predictResult.confidence}</p>
+                    <p><span className="text-slate-500 dark:text-slate-500">Method:</span> {predictResult.method}</p>
+                    <p><span className="text-slate-500 dark:text-slate-500">Confidence:</span> {predictResult.confidence}</p>
                     <p className="text-[11px] text-slate-500 pt-1 font-sans">{predictResult.note}</p>
                   </div>
                 </div>

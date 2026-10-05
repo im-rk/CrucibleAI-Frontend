@@ -27,9 +27,9 @@ const PHASES: { id: AgentName; label: string; icon: React.ElementType }[] = [
 ];
 
 const TONE_CLASS = {
-  info: 'text-slate-200',
-  warn: 'text-amber-300',
-  error: 'text-rose-400',
+  info: 'text-slate-800 dark:text-slate-200',
+  warn: 'text-amber-700 dark:text-amber-300',
+  error: 'text-rose-700 dark:text-rose-400',
 } as const;
 
 function phaseStyle(state: PhaseState): string {
@@ -41,7 +41,7 @@ function phaseStyle(state: PhaseState): string {
     case 'error':
       return 'bg-rose-500/10 border-rose-500/40 text-rose-700 dark:text-rose-400';
     default:
-      return 'bg-slate-50 dark:bg-slate-950/40 border-slate-200 dark:border-slate-800 text-slate-400 dark:text-slate-500';
+      return 'bg-slate-50 dark:bg-slate-950/40 border-slate-200 dark:border-slate-800 text-slate-500 dark:text-slate-500';
   }
 }
 
@@ -141,8 +141,8 @@ export const AgentProgress: React.FC<AgentProgressProps> = ({
               agentLogs.map((log, idx) => (
                 <div key={idx} className="flex items-start gap-2">
                   <span className="text-slate-500 select-none">[{idx + 1}]</span>
-                  <span className="text-cyan-400 font-semibold">[{log.agent ?? log.step}]</span>
-                  <span className="text-slate-200">{log.details}</span>
+                  <span className="text-cyan-700 dark:text-cyan-400 font-semibold">[{log.agent ?? log.step}]</span>
+                  <span className="text-slate-800 dark:text-slate-200">{log.details}</span>
                   {log.duration_ms !== undefined && (
                     <span className="text-slate-500 ml-auto shrink-0">{(log.duration_ms / 1000).toFixed(2)}s</span>
                   )}
@@ -152,7 +152,7 @@ export const AgentProgress: React.FC<AgentProgressProps> = ({
               progress.log.map((line, idx) => (
                 <div key={idx} className="flex items-start gap-2">
                   <span className="text-slate-500 select-none">[{idx + 1}]</span>
-                  <span className="text-cyan-400 font-semibold">[{line.agent}]</span>
+                  <span className="text-cyan-700 dark:text-cyan-400 font-semibold">[{line.agent}]</span>
                   <span className={TONE_CLASS[line.tone]}>{line.text}</span>
                 </div>
               ))

@@ -44,7 +44,7 @@ export const CitationsPanel: React.FC<CitationsPanelProps> = ({
         <div className="p-3.5 bg-slate-50 dark:bg-slate-950/80 rounded-md border border-slate-200 dark:border-slate-800/80 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 text-xs">
           {/* Text Search Filter */}
           <div className="relative flex-1">
-            <Search className="w-4 h-4 text-slate-400 absolute left-3 top-2.5 pointer-events-none" />
+            <Search className="w-4 h-4 text-slate-500 absolute left-3 top-2.5 pointer-events-none" />
             <input
               type="text"
               value={textSearch}
@@ -80,7 +80,7 @@ export const CitationsPanel: React.FC<CitationsPanelProps> = ({
           </div>
         ) : (
           <div className="p-8 text-center bg-slate-50 dark:bg-slate-950/60 rounded-md border border-slate-200 dark:border-slate-800 text-slate-500 text-xs space-y-2">
-            <Filter className="w-6 h-6 text-slate-400 dark:text-slate-600 mx-auto" />
+            <Filter className="w-6 h-6 text-slate-500 dark:text-slate-600 mx-auto" />
             <p>No literature paper chunks match your active filters.</p>
             <button
               onClick={() => {

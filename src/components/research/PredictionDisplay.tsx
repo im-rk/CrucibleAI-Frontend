@@ -81,7 +81,7 @@ export const PredictionDisplay: React.FC<PredictionDisplayProps> = ({
                   </div>
                   {pred.note && (
                     <p className="text-[11px] text-slate-500 dark:text-slate-400 flex items-start gap-1 pt-1 font-sans">
-                      <AlertCircle className="w-3.5 h-3.5 text-slate-400 shrink-0 mt-0.5" />
+                      <AlertCircle className="w-3.5 h-3.5 text-slate-500 shrink-0 mt-0.5" />
                       <span>{pred.note}</span>
                     </p>
                   )}
