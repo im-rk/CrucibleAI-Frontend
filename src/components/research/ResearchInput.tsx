@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Button } from '../common/Button';
 
 interface ResearchInputProps {
-  onSubmit: (query: string, maxResults: number) => void;
+  onSubmit: (query: string, maxResults: number, reviewPlan: boolean) => void;
   isLoading: boolean;
   initialQuery?: string;
 }
@@ -12,6 +12,7 @@ const DEPTHS = [5, 10, 20];
 export const ResearchInput: React.FC<ResearchInputProps> = ({ onSubmit, isLoading, initialQuery = '' }) => {
   const [query, setQuery] = useState<string>(initialQuery);
   const [maxResults, setMaxResults] = useState<number>(10);
+  const [reviewPlan, setReviewPlan] = useState(false);
 
   // A preset or palette query starts a run from outside this form: show what is being run.
   useEffect(() => {
@@ -20,7 +21,7 @@ export const ResearchInput: React.FC<ResearchInputProps> = ({ onSubmit, isLoadin
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (query.trim() && !isLoading) onSubmit(query.trim(), maxResults);
+    if (query.trim() && !isLoading) onSubmit(query.trim(), maxResults, reviewPlan);
   };
 
   return (
@@ -60,9 +61,15 @@ export const ResearchInput: React.FC<ResearchInputProps> = ({ onSubmit, isLoadin
             ))}
           </div>
         </div>
-        <Button type="submit" isLoading={isLoading} disabled={!query.trim()}>
-          Run research
-        </Button>
+        <div className="flex items-center gap-4">
+          <label className="flex items-center gap-2 text-sm text-slate-600 dark:text-slate-400 cursor-pointer">
+            <input type="checkbox" checked={reviewPlan} onChange={(e) => setReviewPlan(e.target.checked)} disabled={isLoading} />
+            Review the plan first
+          </label>
+          <Button type="submit" isLoading={isLoading} disabled={!query.trim()}>
+            {reviewPlan ? 'Plan research' : 'Run research'}
+          </Button>
+        </div>
       </div>
     </form>
   );

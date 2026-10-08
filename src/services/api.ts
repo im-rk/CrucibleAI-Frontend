@@ -5,6 +5,10 @@ import {
   MaterialLookupResponse,
   CorpusStatsResponse,
   HealthResponse,
+  PlanPreview,
+  AskResponse,
+  EvaluationResults,
+  PlanData,
 } from '../types/api';
 
 const API_BASE_URL = (import.meta.env.VITE_API_BASE_URL || '').replace(/\/$/, '');
@@ -99,6 +103,32 @@ export const api = {
       },
     });
     return handleResponse<CorpusStatsResponse>(response);
+  },
+
+  /** The plan a run would use (criteria, queries, material families), for review before running. */
+  async previewPlan(query: string, plan?: PlanData | null): Promise<PlanPreview> {
+    const response = await fetch(`${API_BASE_URL}/api/research/plan`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ query: query.trim(), plan: plan ?? null }),
+    });
+    return handleResponse<PlanPreview>(response);
+  },
+
+  /** Ask a follow-up question about a finished run; answers cite that run's own evidence. */
+  async askRun(sessionId: string, question: string, history: { role: string; content: string }[]): Promise<AskResponse> {
+    const response = await fetch(`${API_BASE_URL}/api/runs/${encodeURIComponent(sessionId)}/ask`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ question, history }),
+    });
+    return handleResponse<AskResponse>(response);
+  },
+
+  /** The latest results of the backend's evaluation suite. */
+  async getEvaluation(): Promise<EvaluationResults> {
+    const response = await fetch(`${API_BASE_URL}/api/evaluation/latest`, { headers: { Accept: 'application/json' } });
+    return handleResponse<EvaluationResults>(response);
   },
 
   /**

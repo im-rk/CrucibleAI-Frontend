@@ -19,6 +19,14 @@ import { MaterialRadarChart } from './components/research/MaterialRadarChart';
 import { CommandPalette } from './components/common/CommandPalette';
 import { EmptyState } from './components/feedback/EmptyState';
 import { ErrorState } from './components/feedback/ErrorState';
+import { PlanCard } from './components/research/PlanCard';
+import { PlanReview } from './components/research/PlanReview';
+import { InvestigationPanel } from './components/research/InvestigationPanel';
+import { TracePanel } from './components/research/TracePanel';
+import { AskPanel } from './components/research/AskPanel';
+import { EvaluationView } from './components/research/EvaluationView';
+import { api } from './services/api';
+import { PlanData, PlanPreview } from './types/api';
 import { useResearch } from './hooks/useResearch';
 import { useHealth } from './hooks/useHealth';
 import { useTheme } from './context/ThemeContext';
@@ -26,7 +34,7 @@ import { exportResearchMarkdown, exportResearchJSON } from './utils/exportReport
 import { clsx } from 'clsx';
 
 type ResultTab =
-  | 'overview' | 'candidates' | 'hypotheses' | 'predictions' | 'analytics' | 'radar' | 'literature' | 'references';
+  | 'overview' | 'candidates' | 'hypotheses' | 'predictions' | 'analytics' | 'radar' | 'literature' | 'references' | 'trace' | 'ask';
 
 export function App() {
   const { isOnline, health, corpus } = useHealth();
@@ -36,9 +44,37 @@ export function App() {
   const [activeTab, setActiveTab] = useState<ResultTab>('overview');
   const [isToolsOpen, setIsToolsOpen] = useState(false);
   const [isCommandPaletteOpen, setIsCommandPaletteOpen] = useState(false);
+  const [view, setView] = useState<'research' | 'evaluation'>('research');
+  const [pendingPlan, setPendingPlan] = useState<{ query: string; maxResults: number; preview: PlanPreview } | null>(null);
+  const [planning, setPlanning] = useState(false);
+  const [planError, setPlanError] = useState<string | null>(null);
 
   const isLoading = status === 'SUBMITTING' || status === 'STREAMING';
   const hasResult = status === 'COMPLETED' && result !== null;
+
+  const submit = async (q: string, maxResults: number, reviewPlan: boolean) => {
+    setPlanError(null);
+    if (!reviewPlan) {
+      setPendingPlan(null);
+      executeResearch(q, maxResults);
+      return;
+    }
+    setPlanning(true);
+    try {
+      setPendingPlan({ query: q, maxResults, preview: await api.previewPlan(q) });
+    } catch (err) {
+      setPlanError(err instanceof Error ? err.message : 'Could not prepare a plan.');
+    } finally {
+      setPlanning(false);
+    }
+  };
+
+  const runWithPlan = (plan: PlanData) => {
+    if (!pendingPlan) return;
+    const { query: q, maxResults } = pendingPlan;
+    setPendingPlan(null);
+    executeResearch(q, maxResults, plan);
+  };
 
   const handleExportMarkdown = () => {
     if (result) exportResearchMarkdown(result);
@@ -57,6 +93,8 @@ export function App() {
         { id: 'radar', label: 'Radar' },
         { id: 'literature', label: `Evidence (${result.search_results.length})` },
         { id: 'references', label: `References (${result.citations.length})` },
+        ...(result.trace ? [{ id: 'trace' as ResultTab, label: 'Trace' }] : []),
+        { id: 'ask' as ResultTab, label: 'Ask' },
       ]
     : [];
 
@@ -68,12 +106,21 @@ export function App() {
         onNewResearch={resetResearch}
         onOpenCommandPalette={() => setIsCommandPaletteOpen(true)}
         hasActiveResearch={status !== 'IDLE'}
+        view={view}
+        onToggleView={() => setView((v) => (v === 'research' ? 'evaluation' : 'research'))}
       />
 
-      <div className="space-y-8">
-        <ResearchInput onSubmit={(q, maxRes) => executeResearch(q, maxRes)} isLoading={isLoading} initialQuery={query} />
+      {view === 'evaluation' && <EvaluationView />}
 
-        {status === 'IDLE' && (
+      <div className={clsx('space-y-8', view === 'evaluation' && 'hidden')}>
+        <ResearchInput onSubmit={submit} isLoading={isLoading || planning} initialQuery={query} />
+
+        {planError && <p className="text-sm text-rose-700 dark:text-rose-400">{planError}</p>}
+        {pendingPlan && !isLoading && (
+          <PlanReview preview={pendingPlan.preview} onRun={runWithPlan} onCancel={() => setPendingPlan(null)} />
+        )}
+
+        {status === 'IDLE' && !pendingPlan && (
           <div className="space-y-6">
             <EmptyState corpus={corpus} health={health} />
             <PresetQueries onSelectQuery={(q) => executeResearch(q)} disabled={isLoading} />
@@ -125,12 +172,14 @@ export function App() {
 
             {activeTab === 'overview' && (
               <div className="space-y-6">
+                {result.plan && <PlanCard plan={result.plan} />}
                 <HypothesesPanel hypotheses={result.hypotheses} grounding={result.grounding} />
                 <CandidatesTable
                   candidates={result.candidates}
                   propertyRecords={result.property_records}
                   krrPredictions={result.krr_predictions}
                 />
+                {result.investigation && <InvestigationPanel investigation={result.investigation} />}
                 <KnowledgeGapsPanel
                   gaps={result.knowledge_gaps}
                   criteria={result.criteria}
@@ -178,6 +227,8 @@ export function App() {
             )}
             {activeTab === 'literature' && <CitationsPanel searchResults={result.search_results} query={result.query} />}
             {activeTab === 'references' && <ReferencesPanel citations={result.citations} />}
+            {activeTab === 'trace' && result.trace && <TracePanel trace={result.trace} />}
+            {activeTab === 'ask' && <AskPanel sessionId={result.session_id} />}
           </div>
         )}
       </div>

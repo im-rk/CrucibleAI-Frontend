@@ -6,22 +6,25 @@ English; it streams the agents' progress live and shows a ranked, cited, grounde
 
 ## What you see
 
-- **Live agent pipeline.** The five real stages (Search → Extraction → Screening → Hypotheses →
-  Grounding) light up as the backend runs them, with a running log, per-stage timings, retry
-  counts when a weak search is re-run, and a **Stop** button that cancels the run server-side.
-- **Run mode banner.** Says plainly whether the run used an LLM and live Materials Project data,
-  or the degraded heuristic mode / offline reference table, and lists every warning.
-- **Ranked candidates** with a per-criterion verdict (met / not met / no data / ML-estimated),
-  the value and source behind each verdict, sortable columns, and links to the supporting papers.
-  Values predicted by Kernel Ridge Regression are always marked as estimates, with their
-  cross-validated uncertainty.
-- **Testable hypotheses** with the evidence each one cites, a suggested experiment, a confidence
-  level, and a grounding check result. Hypotheses that are only templates, or that are not
-  supported by their evidence, are labelled as such.
-- **Knowledge gaps**, the criteria parsed from your goal, and the search queries tried.
-- **References** with clickable arXiv/DOI links and which hypotheses/candidates cite each.
-- Evidence passages, property charts, a radar profile, a direct tools drawer (KRR prediction,
-  Materials Project lookup), and Markdown / JSON export of the full report.
+- **A plan you can edit.** Tick *Review the plan first* and the planner shows the criteria it parsed from your goal and the searches
+  it intends to run. Untick a criterion or rewrite a query, then run with your version.
+- **Live agent pipeline.** Eight real stages (Plan, Literature search, Extract values, Screen candidates, Investigate gaps,
+  Hypotheses, Verify and revise, Report) light up as the backend runs them, with a running log of what each did (including the
+  investigator's tool calls), retry counts, and a **Stop** button that cancels the run server-side.
+- **Run mode banner.** Says plainly whether the run used a language model and live Materials Project data, or the degraded
+  rule-based mode / offline reference table, and lists every warning.
+- **Ranked candidates** with a per-criterion verdict (met / not met / no data / ML-estimated), the value and source behind each,
+  sortable columns, and links to the supporting papers. Estimates from the ML model are always marked and cannot make a candidate qualify.
+- **Hypotheses the system has checked.** Each cites its evidence, carries a confidence and a suggested experiment, and shows the critic's
+  grounding result. When the critic sent weak hypotheses back to be rewritten, the score by round is shown ("0.10 → 0.60 → 0.70") and
+  rewritten ones are marked.
+- **Evidence gaps investigated**: the investigator agent's reasoning, each tool it chose and what came back.
+- **Trace**: what the run cost. Model calls and cache hits, tokens, time spent waiting on a provider rate limit, time per agent, and a
+  timeline of every model call, retrieval and tool call.
+- **Ask**: follow-up questions about the run, answered only from that run's own evidence, with citations.
+- **Evaluation**: the backend's measured results (retrieval, extraction, prompt-injection resistance, end-to-end invariants).
+- Knowledge gaps, references with clickable arXiv/DOI links, evidence passages, property charts, a radar profile, a lookup-and-predict
+  drawer, and Markdown / JSON export of the full report.
 
 ## Getting started
 

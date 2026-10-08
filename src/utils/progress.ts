@@ -1,4 +1,4 @@
-import { AGENTS, AgentName, RunMode, StreamEvent } from '../types/api';
+import { AGENTS, AgentName, EventAgent, RunMode, StreamEvent } from '../types/api';
 
 export type PhaseState = 'pending' | 'active' | 'done' | 'error';
 
@@ -35,6 +35,10 @@ export function initialProgress(): RunProgress {
 }
 
 const STEP = 100 / AGENTS.length;
+
+/** The reviser has no stage of its own: it works inside the critic's, so the loop reads as one step. */
+const STAGE_OF: Partial<Record<EventAgent, AgentName>> = { ReviserAgent: 'CriticAgent' };
+const stageOf = (agent: EventAgent): AgentName => (STAGE_OF[agent] ?? agent) as AgentName;
 
 function percentOf(phases: Record<AgentName, PhaseState>): number {
   const done = AGENTS.filter((a) => phases[a] === 'done' || phases[a] === 'error').length;
@@ -79,14 +83,36 @@ export function describeEvent(e: StreamEvent): LogLine | null {
       return { agent: 'ScreeningAgent', text: `KRR estimate for ${e.formula} ${e.property}: ${formatScientific(e.value)}`, tone: 'info' };
     case 'candidates_found':
       return { agent: 'ScreeningAgent', text: `${e.count} candidates, ${e.qualified} fully qualified`, tone: 'info' };
+    case 'plan_ready':
+      return {
+        agent: 'PlannerAgent',
+        text: `Plan (${e.source}): ${e.criteria.length} criteria, ${e.queries.length} search queries${e.families.length ? `, families: ${e.families.join(', ')}` : ''}`,
+        tone: 'info',
+      };
+    case 'investigation_start':
+      return { agent: 'InvestigatorAgent', text: `Looking for evidence on ${e.targets.join(', ')}`, tone: 'info' };
+    case 'tool_call': {
+      const args = Object.values(e.arguments).join(', ');
+      return e.action === 'finish'
+        ? { agent: 'InvestigatorAgent', text: 'Finished investigating', tone: 'info' }
+        : { agent: 'InvestigatorAgent', text: `${e.action}(${args})${e.ok ? '' : ' failed'}`, tone: e.ok ? 'info' : 'warn' };
+    }
+    case 'investigation_done':
+      return {
+        agent: 'InvestigatorAgent',
+        text: `${e.new_passages} new passages, ${e.new_records} new values${e.supported.length ? `; literature now supports ${e.supported.join(', ')}` : ''}`,
+        tone: 'info',
+      };
     case 'hypotheses_generated':
       return { agent: 'HypothesisAgent', text: `${e.count} hypotheses, ${e.gaps} knowledge gaps`, tone: 'info' };
     case 'grounding_check':
       return {
-        agent: 'ReportBuilder',
-        text: e.is_grounded ? `Every hypothesis is backed by its evidence (score ${e.score})` : `Some hypotheses are unsupported (score ${e.score})`,
+        agent: 'CriticAgent',
+        text: e.is_grounded ? `Every hypothesis is backed by its evidence (score ${e.score})` : `${e.revising ? 'Weak hypotheses will be rewritten' : 'Some hypotheses are unsupported'} (score ${e.score})`,
         tone: e.is_grounded ? 'info' : 'warn',
       };
+    case 'hypotheses_revised':
+      return { agent: 'ReviserAgent', text: `Rewrote ${e.revised} hypotheses against their evidence (round ${e.round})`, tone: 'info' };
     case 'agent_error':
       return { agent: e.agent, text: `Failed and skipped: ${e.message}`, tone: 'error' };
     default:
@@ -109,16 +135,16 @@ export function applyEvent(state: RunProgress, e: StreamEvent): RunProgress {
       break;
     case 'agent_start':
       next.queued = false;
-      next.phases[e.agent] = 'active';
+      next.phases[stageOf(e.agent)] = 'active';
       next.message = `${e.agent} working…`;
       break;
     case 'agent_complete':
       // Search runs once per retry pass: it is only "done" when the next agent starts.
-      if (next.phases[e.agent] !== 'error') next.phases[e.agent] = 'done';
-      next.durations[e.agent] = (next.durations[e.agent] ?? 0) + e.duration_ms;
+      if (next.phases[stageOf(e.agent)] !== 'error') next.phases[stageOf(e.agent)] = 'done';
+      next.durations[stageOf(e.agent)] = (next.durations[stageOf(e.agent)] ?? 0) + e.duration_ms;
       break;
     case 'agent_error':
-      next.phases[e.agent] = 'error';
+      next.phases[stageOf(e.agent)] = 'error';
       break;
     case 're_retrieving':
       next.retries = e.attempt;
@@ -132,6 +158,7 @@ export function applyEvent(state: RunProgress, e: StreamEvent): RunProgress {
     next.log = [...state.log, line];
     next.message = line.text;
   }
-  next.percent = percentOf(next.phases);
+  // Loops (re-retrieval, re-screening, critique and revision) re-activate finished stages; the bar never goes back.
+  next.percent = Math.max(state.percent, percentOf(next.phases));
   return next;
 }

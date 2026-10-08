@@ -8,6 +8,8 @@ interface HeaderProps {
   onNewResearch: () => void;
   onOpenCommandPalette: () => void;
   hasActiveResearch: boolean;
+  view: 'research' | 'evaluation';
+  onToggleView: () => void;
 }
 
 const linkClass =
@@ -19,6 +21,8 @@ export const Header: React.FC<HeaderProps> = ({
   onNewResearch,
   onOpenCommandPalette,
   hasActiveResearch,
+  view,
+  onToggleView,
 }) => {
   const { mode, toggleMode } = useTheme();
 
@@ -39,7 +43,10 @@ export const Header: React.FC<HeaderProps> = ({
           />
           {isOnline ? 'Backend connected' : 'Backend not reachable'}
         </span>
-        {hasActiveResearch && (
+        <button onClick={onToggleView} className={linkClass}>
+          {view === 'research' ? 'Evaluation' : 'Back to research'}
+        </button>
+        {hasActiveResearch && view === 'research' && (
           <button onClick={onNewResearch} className={linkClass}>
             New goal
           </button>
