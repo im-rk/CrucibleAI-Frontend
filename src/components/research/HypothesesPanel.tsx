@@ -42,6 +42,12 @@ export const HypothesesPanel: React.FC<HypothesesPanelProps> = ({ hypotheses, gr
       </CardHeader>
 
       <CardContent className="space-y-4">
+        {grounding.history && grounding.history.length > 1 && (
+          <p className="text-sm text-slate-600 dark:text-slate-400">
+            A critic checked each hypothesis against its cited evidence and sent weak ones back to be rewritten. Grounding score by round:{' '}
+            <span className="font-mono">{grounding.history.map((r) => r.score.toFixed(2)).join(' \u2192 ')}</span>.
+          </p>
+        )}
         {hypotheses.length === 0 && (
           <p className="text-sm text-slate-500 font-sans">
             No hypotheses could be generated from the available evidence. The knowledge gaps list what was missing.
@@ -58,6 +64,9 @@ export const HypothesesPanel: React.FC<HypothesesPanelProps> = ({ hypotheses, gr
               <Badge variant={CONFIDENCE_VARIANT[h.confidence]} size="sm">{h.confidence} confidence</Badge>
               {h.origin === 'template' && (
                 <Badge variant="slate" size="sm" icon={<Info className="w-3 h-3" />}>template, not model reasoning</Badge>
+              )}
+              {h.origin === 'llm-revised' && (
+                <Badge variant="indigo" size="sm">rewritten after critique{h.revisions && h.revisions > 1 ? ` (x${h.revisions})` : ''}</Badge>
               )}
               {h.grounded === false && (
                 <Badge variant="rose" size="sm" icon={<AlertTriangle className="w-3 h-3" />}>not supported by its evidence</Badge>

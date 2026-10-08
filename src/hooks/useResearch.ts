@@ -1,5 +1,5 @@
 import { useState, useCallback, useRef } from 'react';
-import { ResearchStatus, ResearchResponse } from '../types/api';
+import { ResearchStatus, ResearchResponse, PlanData } from '../types/api';
 import { streamResearch } from '../services/sse';
 import { applyEvent, initialProgress, RunProgress } from '../utils/progress';
 
@@ -27,7 +27,7 @@ export function useResearch() {
   }, [cancel]);
 
   const executeResearch = useCallback(
-    async (searchQuery: string, maxResults = 10) => {
+    async (searchQuery: string, maxResults = 10, plan: PlanData | null = null) => {
       const trimmed = searchQuery.trim();
       if (!trimmed) return;
 
@@ -43,7 +43,7 @@ export function useResearch() {
 
       try {
         const report = await streamResearch(
-          { query: trimmed, max_results: maxResults },
+          { query: trimmed, max_results: maxResults, plan },
           (event) => {
             setStatus('STREAMING');
             setProgress((prev) => applyEvent(prev, event));

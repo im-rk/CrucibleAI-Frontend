@@ -55,7 +55,7 @@ export async function streamResearch(
     response = await fetch(`${API_BASE_URL}/api/research/stream`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', Accept: 'text/event-stream' },
-      body: JSON.stringify({ query: request.query, max_results: request.max_results ?? 10 }),
+      body: JSON.stringify({ query: request.query, max_results: request.max_results ?? 10, plan: request.plan ?? null }),
       signal,
     });
   } catch (err) {

@@ -25,7 +25,7 @@ export const PredictionDisplay: React.FC<PredictionDisplayProps> = ({
           Machine Learning Property Predictions (Kernel Ridge Regression)
         </CardTitle>
         <Badge variant="indigo" size="sm">
-          RBF Kernel Engine Active
+          Kernel ridge regression estimate
         </Badge>
       </CardHeader>
 

@@ -67,8 +67,16 @@ describe('streamResearch', () => {
     expect(seen).toEqual(['session_started', 'agent_start', 'complete']);
     expect(global.fetch).toHaveBeenCalledWith(
       expect.stringContaining('/api/research/stream'),
-      expect.objectContaining({ method: 'POST', body: JSON.stringify({ query: 'solid electrolytes', max_results: 5 }) }),
+      expect.objectContaining({ method: 'POST', body: JSON.stringify({ query: 'solid electrolytes', max_results: 5, plan: null }) }),
     );
+  });
+
+  it('sends a plan the user reviewed and edited', async () => {
+    global.fetch = vi.fn().mockResolvedValue(streamOf([frame('complete', { report: REPORT })]));
+    const plan = { summary: 's', criteria: [], queries: ['only this query'], material_families: [], source: 'user' as const };
+    await streamResearch({ query: 'q', plan }, () => undefined);
+    const body = JSON.parse((global.fetch as unknown as { mock: { calls: [string, { body: string }][] } }).mock.calls[0][1].body);
+    expect(body.plan).toEqual(plan);
   });
 
   it('delivers events that arrive split across network chunks', async () => {

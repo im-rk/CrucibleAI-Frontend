@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { applyEvent, describeEvent, initialProgress, RunProgress } from '../src/utils/progress';
-import { StreamEvent } from '../src/types/api';
+import { AGENTS, StreamEvent } from '../src/types/api';
 
 const run = (events: StreamEvent[]): RunProgress => events.reduce(applyEvent, initialProgress());
 
@@ -26,7 +26,7 @@ describe('applyEvent', () => {
     expect(p.phases.SearchAgent).toBe('done');
     expect(p.phases.ExtractionAgent).toBe('active');
     expect(p.phases.ScreeningAgent).toBe('pending');
-    expect(p.percent).toBe(30); // one of five done (20) + half of the active one (10)
+    expect(p.percent).toBe(19); // one of eight stages done (12.5) + half of the active one (6.25)
   });
 
   it('accumulates search time over retry passes and counts the retries', () => {
@@ -43,13 +43,37 @@ describe('applyEvent', () => {
   });
 
   it('never reports 100% before the run completes', () => {
-    const p = run([
-      'SearchAgent', 'ExtractionAgent', 'ScreeningAgent', 'HypothesisAgent', 'ReportBuilder',
-    ].flatMap((agent) => [
-      { event: 'agent_start', agent },
-      { event: 'agent_complete', agent, duration_ms: 1 },
-    ]) as StreamEvent[]);
+    const p = run(
+      AGENTS.flatMap((agent) => [
+        { event: 'agent_start', agent },
+        { event: 'agent_complete', agent, duration_ms: 1 },
+      ]) as StreamEvent[],
+    );
     expect(p.percent).toBe(99);
+  });
+
+  it('treats the reviser as part of the critic stage', () => {
+    const p = run([
+      { event: 'agent_start', agent: 'CriticAgent' },
+      { event: 'agent_complete', agent: 'CriticAgent', duration_ms: 40 },
+      { event: 'agent_start', agent: 'ReviserAgent' },
+    ]);
+    expect(p.phases.CriticAgent).toBe('active');
+    const done = applyEvent(p, { event: 'agent_complete', agent: 'ReviserAgent', duration_ms: 60 });
+    expect(done.phases.CriticAgent).toBe('done');
+    expect(done.durations.CriticAgent).toBe(100);
+  });
+
+  it('never moves the progress bar backwards when a loop re-activates a finished stage', () => {
+    const before = run([
+      { event: 'agent_start', agent: 'ScreeningAgent' },
+      { event: 'agent_complete', agent: 'ScreeningAgent', duration_ms: 1 },
+      { event: 'agent_start', agent: 'InvestigatorAgent' },
+      { event: 'agent_complete', agent: 'InvestigatorAgent', duration_ms: 1 },
+    ]);
+    const again = applyEvent(before, { event: 'agent_start', agent: 'ScreeningAgent' }); // the re-screen
+    expect(again.phases.ScreeningAgent).toBe('active');
+    expect(again.percent).toBeGreaterThanOrEqual(before.percent);
   });
 
   it('keeps a failed agent as failed even though it still completes', () => {
@@ -77,6 +101,23 @@ describe('applyEvent', () => {
 });
 
 describe('describeEvent', () => {
+  it('summarises the plan', () => {
+    const line = describeEvent({ event: 'plan_ready', source: 'llm', summary: 's', criteria: ['a', 'b'], queries: ['q'], families: ['sulfides'] });
+    expect(line).toMatchObject({ agent: 'PlannerAgent', text: expect.stringContaining('2 criteria') });
+    expect(line?.text).toContain('sulfides');
+  });
+
+  it('shows the investigator\'s tool calls and flags failed ones', () => {
+    expect(describeEvent({ event: 'tool_call', action: 'search_literature', arguments: { query: 'AlN gap' }, ok: true })?.text).toBe('search_literature(AlN gap)');
+    expect(describeEvent({ event: 'tool_call', action: 'lookup_material', arguments: { formula: 'X' }, ok: false })).toMatchObject({ tone: 'warn' });
+    expect(describeEvent({ event: 'investigation_done', new_passages: 2, new_records: 1, supported: ['AlN'] })?.text).toContain('supports AlN');
+  });
+
+  it('describes the critic loop', () => {
+    expect(describeEvent({ event: 'grounding_check', is_grounded: false, score: 0.3, revising: true })?.text).toContain('will be rewritten');
+    expect(describeEvent({ event: 'hypotheses_revised', round: 1, revised: 4 })).toMatchObject({ agent: 'ReviserAgent', text: expect.stringContaining('4 hypotheses') });
+  });
+
   it('warns when running on the offline reference table', () => {
     expect(describeEvent({ event: 'mp_lookup', formulas: 2, records: 2, online: false })).toMatchObject({
       tone: 'warn',

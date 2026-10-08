@@ -4,8 +4,8 @@ import { RunProgress, PhaseState } from '../../utils/progress';
 import { Card, CardHeader, CardTitle, CardContent } from '../common/Card';
 import { Button } from '../common/Button';
 import {
-  Activity, CheckCircle2, Loader2, Database, Cpu, Info, AlertTriangle,
-  Search, ShieldCheck, Square,
+  Activity, CheckCircle2, Loader2, Database, Cpu, AlertTriangle, ClipboardList,
+  Search, ShieldCheck, Square, FlaskConical, Compass, FileText,
 } from 'lucide-react';
 import { clsx } from 'clsx';
 
@@ -19,11 +19,14 @@ interface AgentProgressProps {
 }
 
 const PHASES: { id: AgentName; label: string; icon: React.ElementType }[] = [
-  { id: 'SearchAgent', label: '1. Literature Search', icon: Search },
-  { id: 'ExtractionAgent', label: '2. Property Extraction', icon: Database },
-  { id: 'ScreeningAgent', label: '3. Screening + KRR', icon: Cpu },
-  { id: 'HypothesisAgent', label: '4. Hypotheses', icon: Info },
-  { id: 'ReportBuilder', label: '5. Grounding Check', icon: ShieldCheck },
+  { id: 'PlannerAgent', label: '1. Plan', icon: ClipboardList },
+  { id: 'SearchAgent', label: '2. Literature search', icon: Search },
+  { id: 'ExtractionAgent', label: '3. Extract values', icon: Database },
+  { id: 'ScreeningAgent', label: '4. Screen candidates', icon: Cpu },
+  { id: 'InvestigatorAgent', label: '5. Investigate gaps', icon: Compass },
+  { id: 'HypothesisAgent', label: '6. Hypotheses', icon: FlaskConical },
+  { id: 'CriticAgent', label: '7. Verify and revise', icon: ShieldCheck },
+  { id: 'ReportBuilder', label: '8. Report', icon: FileText },
 ];
 
 const TONE_CLASS = {
@@ -92,7 +95,7 @@ export const AgentProgress: React.FC<AgentProgressProps> = ({
           )}
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5 gap-3">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3">
           {PHASES.map((phase) => {
             const Icon = phase.icon;
             const state = phaseOf(phase.id);
